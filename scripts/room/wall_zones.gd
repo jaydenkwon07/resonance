@@ -1,18 +1,20 @@
 class_name WallZones
 extends RefCounted
 ## Stage 2 of the smooth-walls pipeline (M7): the cells whose wall must not move. PURE, and the
-## twin of `pinned_cells`/`is_pinned` in scripts/walls.py, which build on `roomlib.exempt_cells`
-## (as if the room were natural): exit aprons and corridor slots, door footprints with their
-## 2-tile approach, and internal ability-gate zones — plus the cell straight out past the bounds
-## from each pinned perimeter cell, where the trace carries an opening's corridor on.
+## twin of `pinned_cells`/`is_pinned` in scripts/walls.py: each exit's mouth (edge cell + landing
+## cell, flanking walls included), door footprints with their 2-tile approach, and internal ability-gate zones — plus the
+## cell straight out past the bounds from each pinned perimeter cell, where the trace carries an
+## opening's corridor on. Past the mouth an exit's walls smooth like any other (owner, round 1).
 ##
 ## Placement comes from RoomGeometry, so these zones sit exactly where doors and links do.
 
 ## Mirrors door.gd / ability_gate.gd `slab_size` (72 across × 90 deep in world axes) and
 ## roomlib.SLAB_W/H — this file can't read the node exports without breaking --script.
 const SLAB := Vector2(72.0, 90.0)
-## Mirrors roomlib.APRON_MIN: the straight flat run held at every exit.
-const APRON_MIN := 4
+## Mirrors walls.MOUTH_DEPTH: cells from the edge an exit stays pinned — the perimeter cell and
+## the landing cell, each across the two opening cells and the wall cell flanking either side, so
+## the edge band and the mirrored landing never move.
+const MOUTH_DEPTH := 2
 
 
 ## A set of pinned cells, as {Vector2i: true}.
@@ -29,11 +31,10 @@ static func pinned_cells(data: Dictionary) -> Dictionary:
 		var inw := geom.inward(at)
 		if inw == Vector2i.ZERO:
 			continue
-		# The corridor slot runs from the edge through the rock border to the apron's end.
 		var along := Vector2i(absi(inw.y), absi(inw.x))
-		for c: Vector2i in [at, at + along]:
-			for k in range(0, APRON_MIN + 2):
-				zone[c + inw * k] = true
+		for m in range(-1, 3):  # the two opening cells plus the wall cell flanking each side
+			for k in MOUTH_DEPTH:
+				zone[at + along * m + inw * k] = true
 		if _has_leaf(d):
 			var centre := geom.inset_point(at, inw, RoomGeometry.DOOR_INSET)
 			for c: Vector2i in _rect_cells(centre, SLAB):

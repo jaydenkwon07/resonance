@@ -54,10 +54,31 @@ Captures, same shot set as the natural-walls v5 pilot (full-bright, dark at `[4,
   question; not decided here.
 - Content: the pickup, entries and the exit zone are clear of wall in B and C.
 
-## Still open for the owner (step 5)
+## Round 1 — owner rulings (2026-09-26)
 
-- **B or C**, and any tuning of the six constants (`WallOutline`/`walls.py`, one place each).
-- Clearance margin (above).
-- The apron-corner kink (above).
+- **C — chosen.** Start values for all six constants, untuned for now.
+- **Exits needn't be a fixed, narrow path; they can vary in length** ("probably better for a more
+  natural look"). Applied in the pipeline: an exit pins only its **mouth** — the edge cell and the
+  landing cell (`MOUTH_DEPTH` 2), across the opening's two floor cells *and the wall cell flanking
+  each side* — instead of the whole 6-cell corridor slot. Past the mouth the exit's walls are
+  corner-cut and roughened like any other wall, which also removes the apron-corner kink. Door,
+  `requires`-gate and sealed-door zones stay fully pinned (the leaf and its approach need them).
+  The flanks matter: without them a wall roughened 1 px into rock beside the mouth fell outside
+  the zone and nicked the Gallery's `from_a` landing cell.
+- Recapture: `captures/hollow-smooth-c-r1-*.png`. Hollow C now **526 vertices**, narrowest still
+  **32 px** at the neck; no content crossed, pins held, loops valid.
+- **Seals on polygons now checked in all eleven rooms — all hold.** The polygon flood fill used to
+  start from the first *authored* entry cell, which can sit flush against a straight wall (the
+  Gallery's did, so its check always failed — before this round too); it now starts from the
+  derived landing, where the game puts the player.
+
+## Still open for the owner
+
+- **Clearance margin** — narrowest is 32 px vs the 30 px player; the spec's margin is unset.
+- **Exit length in the grid.** The pipeline change frees the *rendered* exit; the grids still
+  carry 4–6-tile straight corridors because the natural-walls lint wants a straight
+  `APRON_MIN` (4) apron and exempts the corridor slot from rules 1–3. Letting exit length vary in
+  the grid too means relaxing that rule — a lint-rule change the spec keeps out of this step, so
+  it waits for a ruling (it would land with the natural-walls batch).
 - Feel check in-engine: slide along walls, round the low bend, walk the 3-tile channels —
-  `godot . -- --room=room_hollow --walls=smooth` (add `--walls-amp=0` for B).
+  `godot . -- --room=room_hollow --walls=smooth`.

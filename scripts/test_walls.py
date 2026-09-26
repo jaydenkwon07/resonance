@@ -70,13 +70,13 @@ def main() -> int:
 	hollow = roomlib.load_room(roomlib.ROOMS_DIR / "room_hollow.json")
 	check(walls.wall_loops(hollow) == walls.wall_loops(hollow), "the same grid gives identical loops")
 
-	# Pinning: an apron keeps its straight edges and exact vertices.
+	# Pinning: an exit mouth keeps its exact vertices (owner round 1: only the mouth is pinned).
 	apron = ["##########", "##########", "#.........", "#.........", "#........#", "##########"]
 	r = room(apron, links=[{"at": [9, 2], "to_room": "x", "to_entry": "y"}])
 	traced = walls.trace(apron)[0]
 	final = walls.wall_loops(r)[0]
 	pinned = [v for v in traced if walls.is_pinned(v, walls.pinned_cells(r))]
-	check(pinned and all(v in final for v in pinned), "an apron's pinned vertices survive exactly")
+	check(pinned and all(v in final for v in pinned), "an exit mouth's pinned vertices survive exactly")
 	check(walls.pin_problems(r, walls.wall_loops(r)) == [], "pin check passes on the apron fixture")
 	edge = [v for v in final if v[0] >= 5 * 30 and v[1] in (60, 120)]
 	check(len({v[1] for v in edge}) == 2, "the apron's walls stay on their straight lines")

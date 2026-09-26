@@ -30,6 +30,10 @@ ROUGH_AMP_MIN = 0.0   # px — lets some stretches stay clean
 ROUGH_AMP_MAX = 2.0   # px — about 1/15 of a tile
 ROUGH_SPAN = 120.0    # px of wall between amplitude samples (4 tiles)
 
+# Cells from the edge an exit stays pinned: the perimeter cell and the landing cell, each across
+# the opening's two floor cells and the wall cell flanking either side.
+MOUTH_DEPTH = 2
+
 _M32 = 0xFFFFFFFF
 
 Point = tuple[float, float]
@@ -160,15 +164,37 @@ def signed_area(loop: list) -> float:
 # --- Stage 2: pin ---
 
 def pinned_cells(data: dict) -> set[tuple[int, int]]:
-	"""Cells whose wall must not move: exit aprons and corridor slots (which include the edge
-	band's opening), door footprints and approach clearance, ability-gate zones — the same
-	zones the wall lint exempts, from the same maths, minus the carved-room blanket — plus the
-	cell straight out past the bounds from each pinned perimeter cell, where the trace carries
-	an opening's corridor on (see _is_floor)."""
-	zone = roomlib.exempt_cells({**data, "geometry": "natural"})
+	"""Cells whose wall must not move: each exit's MOUTH (edge cell and landing cell, walls included, so
+	the edge band and the mirrored landing hold), door footprints and approach clearance, and
+	ability-gate zones — plus the cell straight out past the bounds from each pinned perimeter
+	cell, where the trace carries an opening's corridor on (see _is_floor). Past the mouth an
+	exit's walls smooth like any other (owner, Phase 1 round 1): exits needn't be a fixed
+	straight corridor."""
 	grid = data.get("grid", [])
 	h = len(grid)
 	w = len(grid[0]) if h else 0
+	zone: set[tuple[int, int]] = set()
+	for d in list(data.get("links", [])) + list(data.get("sealed_doors", [])):
+		at = tuple(d.get("at", [0, 0]))
+		inw = roomlib.inward(at, w, h)
+		if inw == (0, 0):
+			continue
+		ax, ay = roomlib.along(inw)
+		for m in range(-1, 3):  # the two opening cells plus the wall cell flanking each side
+			for k in range(MOUTH_DEPTH):
+				zone.add((at[0] + ax * m + inw[0] * k, at[1] + ay * m + inw[1] * k))
+		if d.get("door") or d.get("requires") or "sockets" in d:
+			zone |= roomlib.door_reserved_cells(at, inw)
+	for g in data.get("ability_gates", []):
+		cx, cy = roomlib.cell_center(*g["at"])
+		slab = roomlib.rect_to_cells((cx - roomlib.SLAB_W * 0.5, cy - roomlib.SLAB_H * 0.5,
+		                              cx + roomlib.SLAB_W * 0.5, cy + roomlib.SLAB_H * 0.5))
+		fx, fy = g.get("facing", [0, 1])
+		zone |= slab
+		for c in slab:
+			for k in (1, 2):
+				zone.add((c[0] + fx * k, c[1] + fy * k))
+				zone.add((c[0] - fx * k, c[1] - fy * k))
 	for x, y in list(zone):
 		if x == 0:
 			zone.add((-1, y))
@@ -446,7 +472,7 @@ def _box_hits_segment(bx0: float, by0: float, bx1: float, by1: float, a: tuple, 
 
 
 def reach(data: dict, loops: list, box: float, slabs: list, step: float = 3.0) -> set[int]:
-	"""Flood-fill a `box`-sized player centre from the first entry; return the indices of the
+	"""Flood-fill a `box`-sized player centre from the first link's landing; return the indices of the
 	links whose edge band it can touch. `slabs` are extra blocking rects (closed doors/gates).
 	The corridor extension past the bounds is walkable, so bands straddling the edge are reached
 	the way the game reaches them."""
@@ -474,9 +500,14 @@ def reach(data: dict, loops: list, box: float, slabs: list, step: float = 3.0) -
 				near.update(buckets.get((bx, by), ()))
 		return not any(_box_hits_segment(x0, y0, x1, y1, *segs[i]) for i in near)
 
-	entry = next(iter(data["entries"].values()))
-	sx = round((entry[0] * TILE + TILE / 2) / step) * step
-	sy = round((entry[1] * TILE + TILE / 2) / step) * step
+	# Start where the game lands a player: the first link's derived landing (room.gd
+	# _record_entries), not an authored entry cell — that cell can sit flush against a wall.
+	first = data["links"][0]
+	at = tuple(first["at"])
+	leaf = first.get("door") or first.get("requires")
+	lx, ly = roomlib.inset_point(at, roomlib.inward(at, w, h), roomlib.DOOR_ENTRY_INSET if leaf else roomlib.ENTRY_INSET)
+	sx = round(lx / step) * step
+	sy = round(ly / step) * step
 	if not free(sx, sy):
 		return set()
 	seen = {(sx, sy)}

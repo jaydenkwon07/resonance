@@ -59,7 +59,7 @@ option **C** = start values.
 (2) Godot twin beside `RoomGeometry`, behind a `wall_style` flag, parity test passing on the
 Hollow — **DONE** (parity on all eleven rooms); (3) captures in three versions — `bevel`,
 `smooth` B, `smooth` C — **DONE**; (4) report — **DONE, in `hollow-pilot.md`**;
-(5) **owner picks B or C — NEXT, waiting on the owner** — and tunes the
+(5) owner picks B or C — **DONE: C, exits pinned at the mouth only (round 1, `hollow-pilot.md`)** — and tunes the
 constants; record rulings/rounds in `docs/m7-smooth-walls/hollow-pilot.md`. While playing: check
 the feel — sliding along walls, rounding the low bend, the 3-tile channels.
 
@@ -108,8 +108,11 @@ that still reaches every exit), `reach` (the flood fill both use), `inside` (eve
   connected. Segments oriented with floor on the right in screen space (y down); outer floor loops
   have **negative** shoelace area, outcrop loops positive. Merge collinear vertices, rotate each
   loop to its smallest `(y, x)` vertex, sort loops by that vertex.
-- Pins: `roomlib.exempt_cells` (as if natural) + the cell past the bounds from each pinned
-  perimeter cell. A vertex is pinned if any zone cell's **closed** rect contains it.
+- Pins (round 1): each exit's mouth — cells `at + along·m + inward·k`, `m ∈ −1..2` (opening +
+  flanking walls), `k < MOUTH_DEPTH` (2) — plus door/`requires`/sealed-door reserved cells
+  (`roomlib.door_reserved_cells`) and internal gate slabs ± 2 along `facing`, plus the cell past
+  the bounds from each pinned perimeter cell. A vertex is pinned if any zone cell's **closed**
+  rect contains it.
 - Chaikin with pins: per segment a→b — emit `a` if pinned; if both pinned emit nothing more; emit
   `a + (b−a)·r` if `a` free; emit `a + (b−a)·(1−r)` if `b` free. New points are unpinned.
 - Roughen: per segment not pinned at both ends, `pieces = max(1, floor(len/ROUGH_STEP + 0.5))`,
