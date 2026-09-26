@@ -109,7 +109,10 @@ def load_room(path: Path) -> dict:
 # Rules 1–3 of the natural-walls spec, as lint warnings on rooms whose `geometry` is "natural".
 # Thresholds are the owner's "stricter" ruling, to be retuned on the Hollow pilot.
 GEOMETRY_KINDS = ("natural", "carved")
-APRON_MIN = 4             # a straight flat run this deep at every exit (spec §6, §7)
+# An exit's MOUTH: the edge cell and the landing cell, held straight so the edge band and the
+# mirrored landing never move. Past it an exit's length and shape are free (owner, smooth-walls
+# round 1, 2026-09-26 — replaced the straight 4-tile APRON_MIN apron).
+MOUTH_DEPTH = 2
 MAX_STRAIGHT_RUN = 3      # rule 1: a wall face longer than this is a straight wall
 MAX_UNIT_STEPS = 4        # rule 2: this many 1×1 alternating steps is a regular staircase
 PIPE_MAX_WIDTH = 6        # rule 3: a channel this wide or narrower can be a pipe…
@@ -126,6 +129,14 @@ def _floor(grid: list[str], x: int, y: int) -> bool:
 	return 0 <= y < len(grid) and 0 <= x < len(grid[y]) and grid[y][x] == "."
 
 
+def mouth_cells(at: Cell, inw: Cell) -> set[Cell]:
+	"""An exit's mouth: MOUTH_DEPTH cells in from the edge, across the two opening cells and the
+	wall cell flanking either side."""
+	ax, ay = along(inw)
+	return {(at[0] + ax * m + inw[0] * k, at[1] + ay * m + inw[1] * k)
+	        for m in range(-1, 3) for k in range(MOUTH_DEPTH)}
+
+
 def door_reserved_cells(at: Cell, inw: Cell) -> set[Cell]:
 	"""A door/gate leaf's footprint plus its 2-tile approach clearance inward."""
 	cells = rect_to_cells(door_rect(at, inw))
@@ -137,9 +148,9 @@ def door_reserved_cells(at: Cell, inw: Cell) -> set[Cell]:
 
 
 def exempt_cells(data: dict) -> set[Cell]:
-	"""Cells rules 1–3 skip because other conventions require them straight: exit aprons and
-	corridor slots, door/gate footprints with their approach, internal ability-gate zones — or
-	every cell, for a carved room."""
+	"""Cells rules 1–3 skip because other conventions require them straight: exit mouths,
+	door/gate footprints with their approach, internal ability-gate zones — or every cell, for a
+	carved room."""
 	grid = data.get("grid", [])
 	h = len(grid)
 	w = len(grid[0]) if h else 0
@@ -151,10 +162,7 @@ def exempt_cells(data: dict) -> set[Cell]:
 		inw = inward(at, w, h)
 		if inw == (0, 0):
 			continue
-		# The corridor slot runs from the edge through the rock border to the apron's end.
-		for c in opening_cells(at, inw):
-			for k in range(0, APRON_MIN + 2):
-				out.add((c[0] + inw[0] * k, c[1] + inw[1] * k))
+		out |= mouth_cells(at, inw)
 		if d.get("door") or d.get("requires") or "sockets" in d:
 			out |= door_reserved_cells(at, inw)
 	for g in data.get("ability_gates", []):

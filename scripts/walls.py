@@ -30,9 +30,6 @@ ROUGH_AMP_MIN = 0.0   # px — lets some stretches stay clean
 ROUGH_AMP_MAX = 2.0   # px — about 1/15 of a tile
 ROUGH_SPAN = 120.0    # px of wall between amplitude samples (4 tiles)
 
-# Cells from the edge an exit stays pinned: the perimeter cell and the landing cell, each across
-# the opening's two floor cells and the wall cell flanking either side.
-MOUTH_DEPTH = 2
 
 _M32 = 0xFFFFFFFF
 
@@ -179,10 +176,7 @@ def pinned_cells(data: dict) -> set[tuple[int, int]]:
 		inw = roomlib.inward(at, w, h)
 		if inw == (0, 0):
 			continue
-		ax, ay = roomlib.along(inw)
-		for m in range(-1, 3):  # the two opening cells plus the wall cell flanking each side
-			for k in range(MOUTH_DEPTH):
-				zone.add((at[0] + ax * m + inw[0] * k, at[1] + ay * m + inw[1] * k))
+		zone |= roomlib.mouth_cells(at, inw)
 		if d.get("door") or d.get("requires") or "sockets" in d:
 			zone |= roomlib.door_reserved_cells(at, inw)
 	for g in data.get("ability_gates", []):
@@ -471,8 +465,29 @@ def _box_hits_segment(bx0: float, by0: float, bx1: float, by1: float, a: tuple, 
 	return True
 
 
-def reach(data: dict, loops: list, box: float, slabs: list, step: float = 3.0) -> set[int]:
-	"""Flood-fill a `box`-sized player centre from the first link's landing; return the indices of the
+def starts(data: dict) -> list[tuple[float, float]]:
+	"""Where the game puts a player in this room: each `from_*` entry at its link's derived landing
+	(room.gd _record_entries — the authored cell can sit flush against a wall), any other entry
+	at its cell centre."""
+	grid = data["grid"]
+	h, w = len(grid), len(grid[0])
+	links = data.get("links", [])
+	out = []
+	for name, cell in data.get("entries", {}).items():
+		if str(name).startswith("from_") and links:
+			link = min(links, key=lambda l: math.dist(cell, l["at"]))
+			at = tuple(link["at"])
+			leaf = link.get("door") or link.get("requires")
+			out.append(roomlib.inset_point(at, roomlib.inward(at, w, h),
+			                               roomlib.DOOR_ENTRY_INSET if leaf else float(roomlib.ENTRY_INSET)))
+		else:
+			out.append(roomlib.cell_center(*cell))
+	return out
+
+
+def reach(data: dict, loops: list, box: float, slabs: list, start: tuple[float, float],
+          step: float = 3.0) -> set[int]:
+	"""Flood-fill a `box`-sized player centre from `start`; return the indices of the
 	links whose edge band it can touch. `slabs` are extra blocking rects (closed doors/gates).
 	The corridor extension past the bounds is walkable, so bands straddling the edge are reached
 	the way the game reaches them."""
@@ -500,14 +515,8 @@ def reach(data: dict, loops: list, box: float, slabs: list, step: float = 3.0) -
 				near.update(buckets.get((bx, by), ()))
 		return not any(_box_hits_segment(x0, y0, x1, y1, *segs[i]) for i in near)
 
-	# Start where the game lands a player: the first link's derived landing (room.gd
-	# _record_entries), not an authored entry cell — that cell can sit flush against a wall.
-	first = data["links"][0]
-	at = tuple(first["at"])
-	leaf = first.get("door") or first.get("requires")
-	lx, ly = roomlib.inset_point(at, roomlib.inward(at, w, h), roomlib.DOOR_ENTRY_INSET if leaf else roomlib.ENTRY_INSET)
-	sx = round(lx / step) * step
-	sy = round(ly / step) * step
+	sx = round(start[0] / step) * step
+	sy = round(start[1] / step) * step
 	if not free(sx, sy):
 		return set()
 	seen = {(sx, sy)}
@@ -543,31 +552,33 @@ def gate_slabs(data: dict) -> list[tuple[str, tuple]]:
 
 
 def seal_problems(data: dict, loops: list) -> list[str]:
-	"""seal_test on the polygons: with every gate open every exit is reachable, and closing a
-	doored/`requires` link's own slab makes its exit unreachable."""
+	"""seal_test on the polygons, from every place the game lands a player: with every gate open
+	every exit is reachable, and closing a doored/`requires` link's own slab makes its exit
+	unreachable."""
 	out = []
-	everything = reach(data, loops, roomlib.PLAYER, [])
-	for i, l in enumerate(data["links"]):
-		if i not in everything:
-			out.append(f"exit to {l['to_room']} unreachable with every gate open")
 	grid = data["grid"]
 	h, w = len(grid), len(grid[0])
-	for i, l in enumerate(data["links"]):
-		if l.get("door") or l.get("requires"):
-			at = tuple(l["at"])
-			if i in reach(data, loops, roomlib.PLAYER, [roomlib.door_rect(at, roomlib.inward(at, w, h))]):
-				out.append(f"exit to {l['to_room']} still reachable with its gate shut (bypass)")
+	for start in starts(data):
+		everything = reach(data, loops, roomlib.PLAYER, [], start)
+		for i, l in enumerate(data["links"]):
+			if i not in everything:
+				out.append(f"exit to {l['to_room']} unreachable from {start} with every gate open")
+		for i, l in enumerate(data["links"]):
+			if l.get("door") or l.get("requires"):
+				at = tuple(l["at"])
+				if i in reach(data, loops, roomlib.PLAYER, [roomlib.door_rect(at, roomlib.inward(at, w, h))], start):
+					out.append(f"exit to {l['to_room']} still reachable from {start} with its gate shut (bypass)")
 	return out
 
 
 def narrowest(data: dict, loops: list) -> int:
-	"""The widest square player (px) that still reaches every exit with every gate open — the
-	room's narrowest passage, as the collision actually feels it."""
+	"""The widest square player (px) that still reaches every exit from every landing with every
+	gate open — the room's narrowest passage, as the collision actually feels it."""
 	need = set(range(len(data["links"])))
 	lo, hi = 0, 90
 	while lo < hi:
 		mid = (lo + hi + 1) // 2
-		if reach(data, loops, float(mid), []) >= need:
+		if all(reach(data, loops, float(mid), [], st) >= need for st in starts(data)):
 			lo = mid
 		else:
 			hi = mid - 1

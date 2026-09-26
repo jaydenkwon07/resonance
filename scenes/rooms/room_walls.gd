@@ -1,12 +1,12 @@
 class_name RoomWalls
 extends RefCounted
-## The smooth-walls renderer (M7, Phase 1 prototype): builds a room's rock from WallOutline's
-## loops instead of the 47-tile bevel. ONE vertex list per loop feeds all three uses — the drawn
-## wall, its collision and its light occluder — so what looks solid is solid (honest edges).
+## The smooth-walls renderer (M7): builds a room's rock from WallOutline's loops instead of the
+## 47-tile bevel. ONE vertex list per loop feeds all three uses — the drawn wall, its collision
+## and its light occluder — so what looks solid is solid (honest edges).
 ##
-## Behind the `wall_style` flag, `--walls=smooth` on the command line (debug builds; default
-## `bevel` until Phase 2). `--walls-amp=<px>` overrides ROUGH_AMP_MAX so option B (0) and C
-## (start values) can be captured from one build.
+## The `wall_style` flag: `smooth` by default since Phase 2; `--walls=bevel` on the command line
+## (debug builds) shows the old bevel until the owner retires it. `--walls-amp=<px>` overrides
+## ROUGH_AMP_MAX (0 renders option B).
 ##
 ## Drawing, back to front, all with antialiasing off inside the 960×540 SubViewport:
 ##   - the rock body, the atlas's interior rock tile repeated over the padded bounds;
@@ -17,7 +17,7 @@ extends RefCounted
 ## Rock is drawn by painting floor over it rather than clipping, so nothing leans on
 ## clip_children under the CanvasModulate + PointLight2D lighting.
 
-const DEFAULT_STYLE := "bevel"
+const DEFAULT_STYLE := "smooth"
 ## Cells of padding around the grid: the trace runs over cells -2..w, so this covers every loop,
 ## including the corridor carried one cell past each opening.
 const PAD := 2

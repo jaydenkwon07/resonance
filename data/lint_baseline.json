@@ -17,6 +17,7 @@
     { "rule": "tooth", "at": [31, 26] }
   ],
   "room_b": [
+    { "rule": "straight_run", "at": [2, 14] },
     { "rule": "straight_run", "at": [49, 1] },
     { "rule": "straight_run", "at": [6, 2] },
     { "rule": "straight_run", "at": [44, 2] },

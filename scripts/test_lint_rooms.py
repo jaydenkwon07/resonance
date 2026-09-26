@@ -117,11 +117,14 @@ def walls() -> None:
 	wander = ["#######", "##..###", "#...###", "##...##", "##..###", "###...#", "#######"]
 	check(not has(lint_room(_walled(wander))[1], "pipe"), "a channel whose width wanders passes")
 
-	# Exempt: a straight exit apron. The corridor slot to the east edge is required-straight.
-	apron = ["#########", "###......", "#........", "#..#.#.##", "#########"]
+	# Exempt: an exit's mouth is required-straight; the corridor past it is not.
+	apron = ["#########", "####.....", "#........", "#..#.#.##", "#########"]
 	room = _walled(apron, links=[{"at": [8, 1], "to_room": "x", "to_entry": "y"}])
 	check(has(lint_room(_walled(apron))[1], "straight_run")
-		and not has(lint_room(room)[1], "straight_run"), "an exit apron's straight walls are exempt")
+		and not has(lint_room(room)[1], "straight_run"), "an exit mouth's straight walls are exempt")
+	long_exit = ["#########", "##.......", "#........", "#..#.#.##", "#########"]
+	room = _walled(long_exit, links=[{"at": [8, 1], "to_room": "x", "to_entry": "y"}])
+	check(has(lint_room(room)[1], "straight_run"), "a long straight corridor past the mouth warns")
 
 	# Exempt: every cell of a carved room.
 	carved = lint_room(_walled(flat, "carved"))[1]
@@ -143,10 +146,12 @@ def walls() -> None:
 	check(has(lint_room(_walled(slot))[1], "tooth at (4, 1)"), "a 1-tile floor slot warns tooth")
 	alcove = list(box); alcove[1] = "###..#####"      # the same notch 2 wide
 	check(not has(lint_room(_walled(alcove))[1], "tooth"), "a 2-wide alcove passes")
-	lane = ["#########", "#########", "#...#....", "#........", "#########"]  # rock fin in the apron lane
+	lane = ["#########", "#########", "#......#.", "#........", "#########"]  # rock fin in the exit mouth
 	exit_link = [{"at": [8, 2], "to_room": "x", "to_entry": "y"}]
-	check(has(lint_room(_walled(lane))[1], "tooth at (4, 2)")
-		and not has(lint_room(_walled(lane, links=exit_link))[1], "tooth"), "a tooth inside an exit apron is exempt")
+	check(has(lint_room(_walled(lane))[1], "tooth at (7, 2)")
+		and not has(lint_room(_walled(lane, links=exit_link))[1], "tooth"), "a tooth inside an exit mouth is exempt")
+	lane = ["#########", "#########", "#...#....", "#........", "#########"]  # past the mouth
+	check(has(lint_room(_walled(lane, links=exit_link))[1], "tooth at (4, 2)"), "a tooth past the mouth warns")
 
 	# The geometry field is required and closed.
 	r = _walled(flat); del r["geometry"]
@@ -197,9 +202,11 @@ def main() -> int:
 	r = clone(); r["entries"]["spawn"] = [0, 0]
 	check(has(lint_room(r)[0], "not on floor"), "a spawn on rock is an error")
 
-	# Apron too shallow (warning).
-	r = clone(); set_cell(r, 45, 13, "#")  # block door_tutorial's E apron 2 tiles in
-	check(has(lint_room(r)[1], "apron cell"), "a blocked apron is a warning")
+	# Mouth blocked (warning); past the mouth an exit's length is free.
+	r = clone(); set_cell(r, 46, 13, "#")  # block door_tutorial's E mouth 1 tile in
+	check(has(lint_room(r)[1], "mouth cell"), "a blocked exit mouth is a warning")
+	r = clone(); set_cell(r, 45, 13, "#")  # 2 tiles in: past the mouth
+	check(not has(lint_room(r)[1], "mouth cell"), "rock past the mouth is not a mouth warning")
 
 	# Rock percentage outside target (warning).
 	r = clone()

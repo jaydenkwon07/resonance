@@ -26,7 +26,7 @@ import sys
 from pathlib import Path
 
 import roomlib
-from roomlib import APRON_MIN, ROOMS_DIR
+from roomlib import MOUTH_DEPTH, ROOMS_DIR
 
 BASELINE = roomlib.ROOT / "data" / "lint_baseline.json"
 WALL_RULES = ("straight_run", "staircase", "pipe", "tooth")
@@ -129,19 +129,20 @@ def lint_room(data: dict, accepted: list | None = None) -> tuple[list[str], list
 			if cell in reserved:
 				errors.append(f"{what} at {cell} sits in door '{name}'s reserved footprint/approach")
 
-	# --- Apron depth (warning) ---
+	# --- Exit mouth (warning): the landing row straight in from the opening is floor. Past the
+	# mouth an exit's length is free (owner, 2026-09-26). ---
 	for d in list(data.get("links", [])) + list(data.get("sealed_doors", [])):
 		at = tuple(d.get("at", [0, 0]))
 		inw = roomlib.inward(at, cols, rows)
 		if inw == (0, 0):
 			continue
 		for c in roomlib.opening_cells(at, inw):
-			for k in range(1, APRON_MIN + 1):
+			for k in range(1, MOUTH_DEPTH):
 				cell = (c[0] + inw[0] * k, c[1] + inw[1] * k)
 				if not is_floor(*cell):
 					warnings.append(
-						f"exit at {at}: apron cell {cell} ({k} tile(s) in) is not floor — "
-						f"want a straight {APRON_MIN}-tile apron"
+						f"exit at {at}: mouth cell {cell} ({k} tile(s) in) is not floor — "
+						f"the landing needs a {MOUTH_DEPTH}-tile mouth"
 					)
 					break
 

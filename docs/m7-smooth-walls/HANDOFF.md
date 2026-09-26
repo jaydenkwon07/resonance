@@ -69,6 +69,9 @@ keyed on `geometry` — report, don't decide); recapture Cistern beside
 `docs/m5-reference/cistern-final.png` and Gallery beside its M6 reference for owner re-approval;
 **retire the bevel only after owner sign-off** (remove code path + flag, replace the 23 rock-bevel
 tests with no coverage loss); update CLAUDE.md's honest-edges line (trim before adding).
+**Phase 2 status (2026-09-26): steps 1–3 DONE and step 4 captured — see `phase2.md`. Waiting on
+the owner's re-approval of the Cistern and Gallery, the carved-room call, then step 5 (retire
+the bevel).** The exit apron rule was replaced by the exit mouth (`roomlib.MOUTH_DEPTH`).
 
 **Out of scope (stop and report instead):** grid edits (even to fix a clearance/footprint problem
 the checks find), moving content, light tuning (M8), surface detail (M9), floor rendering / the

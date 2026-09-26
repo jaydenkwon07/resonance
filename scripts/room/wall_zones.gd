@@ -11,9 +11,9 @@ extends RefCounted
 ## Mirrors door.gd / ability_gate.gd `slab_size` (72 across × 90 deep in world axes) and
 ## roomlib.SLAB_W/H — this file can't read the node exports without breaking --script.
 const SLAB := Vector2(72.0, 90.0)
-## Mirrors walls.MOUTH_DEPTH: cells from the edge an exit stays pinned — the perimeter cell and
-## the landing cell, each across the two opening cells and the wall cell flanking either side, so
-## the edge band and the mirrored landing never move.
+## Mirrors roomlib.MOUTH_DEPTH / mouth_cells: cells from the edge an exit stays pinned — the
+## perimeter cell and the landing cell, each across the two opening cells and the wall cell
+## flanking either side, so the edge band and the mirrored landing never move.
 const MOUTH_DEPTH := 2
 
 
