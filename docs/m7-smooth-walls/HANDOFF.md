@@ -22,13 +22,10 @@ validated. Since then, in order:
    and pointy, because the 45° bevel only draws 0°/45°/90° and turns every meeting of two cuts into
    a spike. Fix the renderer, not the grid.
 
-**Git state at handoff:** `main` at `ebfbd30`. **`ebfbd30` (Drip) is committed but NOT pushed**
-(origin is at `b801e50`). Untracked and uncommitted:
-- `scripts/walls.py`, `scripts/test_walls.py`, `docs/m7-smooth-walls/` — Phase 1 step 1 (below),
-  tested and green, **not yet committed**. Commit them first; the owner commits per step and has
-  asked for pushes explicitly each time.
-- `_capture_room.gd` / `.tscn` / `.gd.uid` in the project root — the throwaway capture
-  scaffolding. **Never commit it.** Delete it when the natural-walls batch ends.
+**Git state (updated 2026-09-26):** Phase 1 steps 1–4 are committed on `main` (not pushed — the
+owner asks for pushes explicitly). `_capture_room.gd` / `.tscn` / `.gd.uid` in the project root
+stay untracked throwaway scaffolding (now takes `--out=`). **Never commit it.** Delete it when the
+natural-walls batch ends.
 
 **Commit convention:** no `Co-Authored-By` trailer (parent `~/Code/Projects/CLAUDE.md`). Past
 commits end with a `Claude-Session:` line only.
@@ -60,9 +57,9 @@ option **C** = start values.
 
 **Phase 1 — prototype on the Hollow:** (1) Python pipeline + tests + a still — **DONE**;
 (2) Godot twin beside `RoomGeometry`, behind a `wall_style` flag, parity test passing on the
-Hollow; (3) captures in three versions — `bevel`, `smooth` B, `smooth` C — same shot set as the
-Hollow v5 pilot; (4) report: narrowest passage px + where, content touching wall, rock % by area,
-loop vertex counts, anything pinning made look odd; (5) **owner picks B or C** and tunes the
+Hollow — **DONE** (parity on all eleven rooms); (3) captures in three versions — `bevel`,
+`smooth` B, `smooth` C — **DONE**; (4) report — **DONE, in `hollow-pilot.md`**;
+(5) **owner picks B or C — NEXT, waiting on the owner** — and tunes the
 constants; record rulings/rounds in `docs/m7-smooth-walls/hollow-pilot.md`. While playing: check
 the feel — sliding along walls, rounding the low bend, the 3-tile channels.
 
@@ -139,7 +136,7 @@ that still reaches every exit), `reach` (the flood fill both use), `inside` (eve
 
 ---
 
-## Next: Phase 1 step 2 — the Godot twin (start here)
+## Phase 1 step 2 — the Godot twin (DONE; as built, see `hollow-pilot.md`)
 
 **How the bevel is built today** (recon done, reported to owner): all three uses already share
 one source, `RockBevel` (`scripts/rock/rock_bevel.gd`, pure, 23 tests in
