@@ -75,8 +75,10 @@ Rules the lint enforces or reports, all from doing this by hand before the tool 
   at 30.5% by design and the threshold was **not** moved. Leave rock the player never reaches.
 - **Openings are 2 tiles wide.** A link/sealed-door `at` cell plus its neighbour along the edge
   must both be floor.
-- **Every exit gets a straight apron** — a flat run of at least `APRON_MIN` (4) floor tiles
-  straight in from the opening. No steps or rock in the approach.
+- **Every exit gets a mouth** — the edge cell and the landing cell (`MOUTH_DEPTH` 2) straight
+  in from the opening are floor, and they're drawn straight. Past the mouth an exit's length and
+  shape are free: a long straight corridor now warns like any other straight wall (owner,
+  2026-09-26, replacing the 4-tile `APRON_MIN` apron).
 - **Transitions are edge-band, mirrored.** An exit is a thin band at the room boundary; the
   matching `from_<room>` entry on the far side lands one tile inside the destination's mirrored
   edge, at the **same height**, so leaving one room's right edge arrives at the next room's left
@@ -104,7 +106,7 @@ Each is a small array of `{ "at": [col, row], … }` in the room file, placed on
   (the five-note exit); placed and reserved exactly like a real door.
 - `props` — `{ "at" }`. Rubble piles. **No collision, no light, no interaction**, so they never
   touch the frozen geometry, the validator or the seal test. Deterministic `Prop` shape per
-  cell. Keep them off the aprons, out of door footprints, and clear of outcrops. Cap per room is
+  cell. Keep them off the exit mouths, out of door footprints, and clear of outcrops. Cap per room is
   the owner's call (the Cistern used ≤5; the Gallery ≤6, 5 placed).
 
 ---
@@ -139,7 +141,7 @@ Plus the whole test suite (`tests/test_*.gd`, 104) and the one-rule grep from CL
 `lint_rooms.py` turns the by-eye checks into machine checks. **Errors** (non-zero exit) are
 structural — the room would not work: grid integrity, non-perimeter or non-floor openings,
 content off floor / out of bounds, a `from_*` landing on rock, content inside a door's derived
-footprint/approach. **Warnings** (zero exit) are convention and quality: a blocked apron, rock %
+footprint/approach. **Warnings** (zero exit) are convention and quality: a blocked exit mouth, rock %
 off target. Legacy grey-box rooms (`room_c`, `room_d`) trip warnings on purpose until M7
 rebuilds them. Green — no errors — is the bar before a shape is frozen.
 
@@ -172,5 +174,5 @@ Save under `docs/<milestone>-reference/`. Godot rewrites `project.godot` on a wi
 
 A room's geometry is frozen only after: lint green, the shape looks right, and **the owner
 signs off on `godot .`**. After that, any edit must preserve the openings, door footprints,
-approach clearances, aprons, mirrored entries and the rock budget — re-verify all of it. The
+approach clearances, exit mouths, mirrored entries and the rock budget — re-verify all of it. The
 Cistern (`room_a`) and the Gallery (`room_b`) are both LOCKED under this gate.
