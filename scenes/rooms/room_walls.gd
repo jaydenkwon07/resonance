@@ -1,52 +1,35 @@
 class_name RoomWalls
 extends RefCounted
-## The smooth-walls renderer (M7): builds a room's rock from WallOutline's loops instead of the
-## 47-tile bevel. ONE vertex list per loop feeds all three uses — the drawn wall, its collision
-## and its light occluder — so what looks solid is solid (honest edges).
-##
-## The `wall_style` flag: `smooth` by default since Phase 2; `--walls=bevel` on the command line
-## (debug builds) shows the old bevel until the owner retires it. `--walls-amp=<px>` overrides
-## ROUGH_AMP_MAX (0 renders option B).
+## Builds a room's walls from WallOutline's smoothed loops (M7; replaced the 45° bevel). ONE
+## vertex list per loop feeds all three uses — the drawn wall, its collision and its light
+## occluder — so what looks solid is solid (honest edges).
 ##
 ## Drawing, back to front, all with antialiasing off inside the 960×540 SubViewport:
-##   - the rock body, the atlas's interior rock tile repeated over the padded bounds;
+##   - the rock body, RockAtlas's rock tile repeated over the padded bounds;
 ##   - each loop filled by nesting depth: a floor outline with the room's baked floor tiles
-##     (the same per-cell variants the bevel paints — floor rendering doesn't change), an
-##     outcrop with the rock body;
+##     (per-cell variants from Room.floor_variant), an outcrop with the rock body;
 ##   - the dark rim, a closed Line2D on every loop (straddles the edge, `seam_px` wide).
 ## Rock is drawn by painting floor over it rather than clipping, so nothing leans on
 ## clip_children under the CanvasModulate + PointLight2D lighting.
 
-const DEFAULT_STYLE := "smooth"
 ## Cells of padding around the grid: the trace runs over cells -2..w, so this covers every loop,
 ## including the corridor carried one cell past each opening.
 const PAD := 2
 
 
-## The wall style this run uses: `--walls=` in a debug build, else the default.
-static func style() -> String:
-	return _arg("--walls=", DEFAULT_STYLE)
-
-
-## ROUGH_AMP_MAX for this run: `--walls-amp=` in a debug build, else the tuned constant.
-static func amp_max() -> float:
-	return float(_arg("--walls-amp=", str(WallOutline.ROUGH_AMP_MAX)))
-
-
-## Build the walls under `room` from its geometry data and the room's built TileSet.
-static func build(room: Node2D, data: Dictionary, tile_set: TileSet, look: RockStyle) -> void:
+## Build the walls under `room` from its geometry data, at `tp` px per tile.
+static func build(room: Node2D, data: Dictionary, tp: int, look: RockStyle) -> void:
 	if look == null:
 		look = RockStyle.new()
 	var grid: Array = data.get("grid", [])
 	var size := Vector2i(str(grid[0]).length() if grid.size() > 0 else 0, grid.size())
-	var tp := tile_set.tile_size.x
-	var atlas := (tile_set.get_source(RockTileSet.SOURCE_ID) as TileSetAtlasSource).texture.get_image()
-	var rock_tex := ImageTexture.create_from_image(atlas.get_region(Rect2i(RockTileSet.interior_rock_atlas() * tp, Vector2i(tp, tp))))
+	var atlas := RockAtlas.build(tp, look)
+	var rock_tex := ImageTexture.create_from_image(atlas.get_region(RockAtlas.rock_body_rect(tp)))
 	var floor_tex := _bake_floor(atlas, size, tp)
 	var origin := Vector2(-PAD * tp, -PAD * tp)
 	var extent := Vector2(size + Vector2i(PAD, PAD) * 2) * float(tp)
 
-	var walls := WallOutline.loops(data, WallOutline.CHAIKIN_PASSES, amp_max())
+	var walls := WallOutline.loops(data)
 	var art := Node2D.new()
 	art.name = "Walls"
 	room.add_child(art)
@@ -98,7 +81,7 @@ static func _bake_floor(atlas: Image, size: Vector2i, tp: int) -> ImageTexture:
 	var img := Image.create((size.x + PAD * 2) * tp, (size.y + PAD * 2) * tp, false, atlas.get_format())
 	for y in range(-PAD, size.y + PAD):
 		for x in range(-PAD, size.x + PAD):
-			var src := Rect2i(RockTileSet.floor_atlas(Room.floor_variant(x, y)) * tp, Vector2i(tp, tp))
+			var src := RockAtlas.floor_rect(Room.floor_variant(x, y), tp)
 			img.blit_rect(atlas, src, Vector2i(x + PAD, y + PAD) * tp)
 	return ImageTexture.create_from_image(img)
 
@@ -119,10 +102,3 @@ static func _by_depth(loops: Array[PackedVector2Array]) -> Array[int]:
 	order.sort_custom(func(a: int, b: int) -> bool: return depth[a] < depth[b] or (depth[a] == depth[b] and a < b))
 	return order
 
-
-static func _arg(prefix: String, fallback: String) -> String:
-	if OS.is_debug_build():
-		for arg in OS.get_cmdline_user_args():
-			if arg.begins_with(prefix):
-				return arg.trim_prefix(prefix)
-	return fallback

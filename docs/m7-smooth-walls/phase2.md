@@ -63,10 +63,30 @@ keyed on `geometry: carved`.
 - **Gallery:** `phase2/b-smooth-full-{lit,dark}.png` beside `b-bevel-*` and
   `docs/m6-reference/gallery-{final,lit}.png` (same three-screen framing).
 
-## Still for the owner
+## Owner rulings (2026-09-26)
 
-- Re-approve the Cistern and the Gallery (and say which bar: full store-page gate or side-by-side).
-- Carved rooms: keep as captured, or fewer passes / no roughness for them.
-- Hollow's east exit pipe (`straight_run [26,8]`): shorten it now, or leave it for later.
-- Then Step 5: retire the bevel (remove `RockBevel`'s tile path + the flag, replace the 23
-  rock-bevel tests without losing coverage) — or keep the flag until after M8, as the spec asked.
+- **Cistern and Gallery — re-approved** against their original references.
+- **Carved rooms — keep as captured** (two passes + roughness, like the natural rooms).
+- **Retire the bevel — yes, now** (not held until M8).
+- Hollow east exit pipe (`straight_run [26,8]`) — not ruled; stays an open lint warning for the
+  natural-walls batch.
+
+## Step 5 — bevel retired
+
+- Removed: `scripts/rock/rock_bevel.gd` (`RockBevel`), `scenes/rooms/rock_tileset.gd`
+  (`RockTileSet`: the 47-tile blob terrain, per-tile collision polygons and occluders, per-tile
+  seam), the `TileMapLayer` path in `room.gd`, the `--walls=` flag and `--walls-amp=`,
+  `RockStyle.bevel_convex`/`bevel_concave`.
+- Added: `scenes/rooms/rock_atlas.gd` (`RockAtlas`) — only the art the walls use: the five floor
+  tiles and the rock body, drawn from the same seeds. `room.gd`'s tile size is now
+  `WallTrace.TILE`. **Verified pixel-identical:** whole-room lit and dark composites of the
+  Cistern before and after the retirement match byte for byte; the Hollow's differ only in the
+  132 px of the spinning note pickup (animation timing).
+- Tests: `tests/test_rock_bevel.gd` (23) replaced by `tests/test_wall_shape.gd` (23), concern
+  for concern — corners cut at 45° with half-tile legs, straight walls stay straight (was the
+  cut region); passes deepen the cut, zero passes is the trace (leg scales the cut); mirror-
+  symmetric corners (four corners alike); convex and concave corners both cut, floor on the
+  right (active selection, rock-side sign); a one-cell outcrop is its own solid loop even after
+  C, all-rock has no wall (lone-outcrop/interior cases); collision segments are exactly the
+  drawn edges, whole pixels, in room coordinates (collision polygon matches the silhouette,
+  frame). Godot total stays **182**.

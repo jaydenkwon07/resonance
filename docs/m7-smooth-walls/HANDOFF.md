@@ -1,4 +1,4 @@
-# M7 handoff — smooth walls, then the natural-walls batch
+# M7 handoff — smooth walls (done), then the natural-walls batch
 
 **Written 2026-09-25 for a fresh session.** Read CLAUDE.md first (it wins on code conventions),
 then this. Everything here is current as of the last commit named below; verify with `git log`.
@@ -69,9 +69,11 @@ keyed on `geometry` — report, don't decide); recapture Cistern beside
 `docs/m5-reference/cistern-final.png` and Gallery beside its M6 reference for owner re-approval;
 **retire the bevel only after owner sign-off** (remove code path + flag, replace the 23 rock-bevel
 tests with no coverage loss); update CLAUDE.md's honest-edges line (trim before adding).
-**Phase 2 status (2026-09-26): steps 1–3 DONE and step 4 captured — see `phase2.md`. Waiting on
-the owner's re-approval of the Cistern and Gallery, the carved-room call, then step 5 (retire
-the bevel).** The exit apron rule was replaced by the exit mouth (`roomlib.MOUTH_DEPTH`).
+**Phase 2 DONE (2026-09-26) — the smooth-walls step is complete; see `phase2.md`.** Owner
+re-approved the Cistern and Gallery, kept carved rooms as captured, and the bevel is retired
+(`RockBevel`, `RockTileSet`, the `--walls` flag and the 23 rock-bevel tests are gone; `RockAtlas`
++ `tests/test_wall_shape.gd` replace them). The exit apron rule was replaced by the exit mouth
+(`roomlib.MOUTH_DEPTH`). **Next: the natural-walls batch (below).**
 
 **Out of scope (stop and report instead):** grid edits (even to fix a clearance/footprint problem
 the checks find), moving content, light tuning (M8), surface detail (M9), floor rendering / the

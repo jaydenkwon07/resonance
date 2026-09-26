@@ -19,7 +19,8 @@ room two.**
 
 **M5 is complete (2026-09-20) — the store-page gate is MET.** The **Cistern**
 (`room_a`, 48×36, the first scrolling room) is composed to store-page quality: a
-procedural rock tileset on a 47-tile blob terrain with bevelled corners, banded
+procedural rock tileset on a 47-tile blob terrain with bevelled corners (replaced in M7 by
+smoothed wall loops — `docs/m7-smooth-walls/phase2.md`), banded
 light + a vignette, doors as designed art objects (carved stone + brass organ
 pipes + category gems, the brightest beacons; an opened door stays a lit
 landmark), a decorative five-socket sealed door, and a light rubble detail pass.

@@ -3,7 +3,7 @@ extends RefCounted
 ## Pure positional maths for a room (M6 Step 2a, extracted from room.gd). No nodes, no
 ## signals, no engine state — just tile→world arithmetic, so it is unit-testable under
 ## --script and is the single source of truth for the numbers a room places content by.
-## `RockTileSet`/`Door`/`SealedDoor` reference EnvPalette and cannot compile under --script;
+## `RockAtlas`/`Door`/`SealedDoor` reference EnvPalette and cannot compile under --script;
 ## this deliberately does not touch them, so it stays testable (the pure-seam discipline,
 ## CLAUDE.md §4).
 ##

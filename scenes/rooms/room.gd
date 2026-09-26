@@ -1,13 +1,13 @@
 class_name Room
 extends Node2D
 ## A room built from data (§6.3, Fork B / D-M3-1). Reads its geometry from RoomGraph
-## (data/rooms/<room_id>.json), paints a TileMapLayer with collision from the shared TileSet —
-## never per-wall StaticBody2Ds (§2) — and instances the room's contents: transition links,
-## note pickups, clue chimes, decorative props/sealed doors, and the doors that gate some
-## links.
+## (data/rooms/<room_id>.json), builds its walls from the smoothed wall loops (RoomWalls, [M7]:
+## drawing, collision and occluders from one outline), and instances the room's contents:
+## transition links, note pickups, clue chimes, decorative props/sealed doors, and the doors
+## that gate some links.
 ##
 ## [M6 Step 2a] The positional maths lives in the pure, unit-tested `RoomGeometry`, and content
-## instancing in `RoomContent`, so this file stays orchestration + tile painting + link wiring
+## instancing in `RoomContent`, so this file stays orchestration + link wiring
 ## and stops growing every time a content type is added. Numbers are unchanged from M5 — the
 ## Cistern's LOCKED geometry is preserved.
 ##
@@ -19,14 +19,14 @@ signal transition_requested(to_room: String, to_entry: String)
 ## Which room this is. A thin per-room .tscn sets this; RoomGraph keys everything off it.
 @export var room_id: String = ""
 
-## The cave tile look (M5 Step 2b). Left null uses RockStyle's defaults; assign a .tres to
-## retune floor/rock value gap, seam and grit without touching code.
+## The cave look (M5 Step 2b). Left null uses RockStyle's defaults; assign a .tres to retune
+## floor/rock value gap, rim and grit without touching code.
 @export var rock_style: RockStyle
 
-# Tile size for the TileSet. 30px makes a 32×18 room exactly 960×540, so a one-screen room is a
-# true fixed screen with no scroll (§5.2, §6.7, D-M3-5). The Room reads the size back from the
-# built TileSet after this seed.
-var _tile_px: int = 30
+# Tile size. 30px makes a 32×18 room exactly 960×540, so a one-screen room is a true fixed screen
+# with no scroll (§5.2, §6.7, D-M3-5). The wall pipeline owns it (WallTrace.TILE, mirrored by
+# roomlib.TILE for the Python tools), so walls and placement can't disagree.
+var _tile_px: int = WallTrace.TILE
 var _size: Vector2i = Vector2i.ZERO
 var _entries: Dictionary = {}   # entry_id -> world-space Vector2 (tile centre)
 var _geom: RoomGeometry
@@ -38,8 +38,8 @@ func _ready() -> void:
 		push_error("Room '%s': no geometry." % room_id)
 		return
 	_size = RoomGeometry.to_v2i(geo.get("size_tiles", [0, 0]))
-	_build_tiles(geo)
-	_geom = RoomGeometry.new(_tile_px, _size)  # after the TileSet reports the final tile size
+	RoomWalls.build(self, geo, _tile_px, rock_style)
+	_geom = RoomGeometry.new(_tile_px, _size)
 	RoomContent.build_props(self, _geom, geo.get("props", []))
 	_record_entries(geo.get("entries", {}), geo.get("links", []))
 	_build_links(geo.get("links", []))
@@ -59,60 +59,18 @@ func entry_position(entry_id: String) -> Vector2:
 	return _entries.get(entry_id, bounds().get_center())
 
 
-# --- Tiles ---
-
-## Floor cells are painted directly with a spatial-hash variant; rock cells are handed to Godot's
-## terrain system, which picks the blob tile per cell from its neighbourhood (M5 Step 1). A
-## one-cell rock ring is added outside the grid so the room's outer perimeter reads as solid rock
-## rather than bevelling into the void — those ring cells sit beyond the camera clamp and behind
-## the perimeter wall, so the player never sees or reaches them.
-##
-## [M7] Under `--walls=smooth` the rock comes from RoomWalls' smoothed loops instead; the TileSet
-## is still built, for its tile size and its floor/rock art.
-func _build_tiles(geo: Dictionary) -> void:
-	var tile_set := RockTileSet.build(_tile_px, rock_style)
-	_tile_px = tile_set.tile_size.x  # single source of truth for the size (§5.2)
-	if RoomWalls.style() == "smooth":
-		RoomWalls.build(self, geo, tile_set, rock_style)
-		return
-	var grid: Array = geo.get("grid", [])
-	var layer := TileMapLayer.new()
-	layer.name = "Tiles"
-	layer.tile_set = tile_set
-	add_child(layer)
-
-	var rock_cells: Array[Vector2i] = []
-	for y in grid.size():
-		var row: String = str(grid[y])
-		for x in row.length():
-			# '#' is solid rock; 'o' is an interior outcrop — also rock for terrain and
-			# collision, kept a distinct symbol only so the mask can count it apart from
-			# "unreached" perimeter rock (M5 Step 4). Everything else is floor.
-			if row[x] == "#" or row[x] == "o":
-				rock_cells.append(Vector2i(x, y))
-			else:
-				layer.set_cell(Vector2i(x, y), RockTileSet.SOURCE_ID, RockTileSet.floor_atlas(floor_variant(x, y)))
-
-	for x in range(-1, _size.x + 1):
-		rock_cells.append(Vector2i(x, -1))
-		rock_cells.append(Vector2i(x, _size.y))
-	for y in range(_size.y):
-		rock_cells.append(Vector2i(-1, y))
-		rock_cells.append(Vector2i(_size.x, y))
-
-	layer.set_cells_terrain_connect(rock_cells, RockTileSet.TERRAIN_SET, RockTileSet.ROCK_TERRAIN)
-
+# --- Floor ---
 
 ## A stable per-cell floor variant so the same room always paints the same, but neighbouring cells
 ## differ: mostly one of the three base variants, occasionally the rare detail tile. A cheap
 ## spatial hash, not RNG — determinism matters (§5). Stays here (not in RoomGeometry) because it
-## references RockTileSet's variant counts, which don't compile under --script. Static so the
-## smooth-walls renderer bakes the identical floor.
+## references RockAtlas's variant counts, which don't compile under --script. RoomWalls bakes the
+## floor from it.
 static func floor_variant(x: int, y: int) -> int:
 	var h := absi((x * 73856093) ^ (y * 19349663))
 	if h % 17 == 0:
-		return RockTileSet.FLOOR_BASE_VARIANTS + (h % RockTileSet.FLOOR_DETAIL_VARIANTS)
-	return h % RockTileSet.FLOOR_BASE_VARIANTS
+		return RockAtlas.FLOOR_BASE_VARIANTS + (h % RockAtlas.FLOOR_DETAIL_VARIANTS)
+	return h % RockAtlas.FLOOR_BASE_VARIANTS
 
 
 # --- Entries and links ---
