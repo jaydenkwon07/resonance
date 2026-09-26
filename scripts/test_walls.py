@@ -117,6 +117,12 @@ def main() -> int:
 		check(probs == [], f"{path.stem}: loops valid, footprints clear, pins held"
 			+ ("" if not probs else f" — {probs[:3]}"))
 
+	# Parity: the fixture the GDScript twin is checked against must be what walls.py makes now.
+	import export_wall_loops
+	current = export_wall_loops.OUT.exists() and export_wall_loops.OUT.read_text(encoding="utf-8") \
+		== export_wall_loops.render(export_wall_loops.export())
+	check(current, "tests/fixtures/wall_loops.json is current (else run scripts/export_wall_loops.py)")
+
 	print(f"\n{_passed} passed, {_failed} failed")
 	return 1 if _failed else 0
 

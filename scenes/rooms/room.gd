@@ -38,7 +38,7 @@ func _ready() -> void:
 		push_error("Room '%s': no geometry." % room_id)
 		return
 	_size = RoomGeometry.to_v2i(geo.get("size_tiles", [0, 0]))
-	_build_tiles(geo.get("grid", []))
+	_build_tiles(geo)
 	_geom = RoomGeometry.new(_tile_px, _size)  # after the TileSet reports the final tile size
 	RoomContent.build_props(self, _geom, geo.get("props", []))
 	_record_entries(geo.get("entries", {}), geo.get("links", []))
@@ -66,9 +66,16 @@ func entry_position(entry_id: String) -> Vector2:
 ## one-cell rock ring is added outside the grid so the room's outer perimeter reads as solid rock
 ## rather than bevelling into the void — those ring cells sit beyond the camera clamp and behind
 ## the perimeter wall, so the player never sees or reaches them.
-func _build_tiles(grid: Array) -> void:
+##
+## [M7] Under `--walls=smooth` the rock comes from RoomWalls' smoothed loops instead; the TileSet
+## is still built, for its tile size and its floor/rock art.
+func _build_tiles(geo: Dictionary) -> void:
 	var tile_set := RockTileSet.build(_tile_px, rock_style)
 	_tile_px = tile_set.tile_size.x  # single source of truth for the size (§5.2)
+	if RoomWalls.style() == "smooth":
+		RoomWalls.build(self, geo, tile_set, rock_style)
+		return
+	var grid: Array = geo.get("grid", [])
 	var layer := TileMapLayer.new()
 	layer.name = "Tiles"
 	layer.tile_set = tile_set
@@ -84,7 +91,7 @@ func _build_tiles(grid: Array) -> void:
 			if row[x] == "#" or row[x] == "o":
 				rock_cells.append(Vector2i(x, y))
 			else:
-				layer.set_cell(Vector2i(x, y), RockTileSet.SOURCE_ID, RockTileSet.floor_atlas(_floor_variant(x, y)))
+				layer.set_cell(Vector2i(x, y), RockTileSet.SOURCE_ID, RockTileSet.floor_atlas(floor_variant(x, y)))
 
 	for x in range(-1, _size.x + 1):
 		rock_cells.append(Vector2i(x, -1))
@@ -99,8 +106,9 @@ func _build_tiles(grid: Array) -> void:
 ## A stable per-cell floor variant so the same room always paints the same, but neighbouring cells
 ## differ: mostly one of the three base variants, occasionally the rare detail tile. A cheap
 ## spatial hash, not RNG — determinism matters (§5). Stays here (not in RoomGeometry) because it
-## references RockTileSet's variant counts, which don't compile under --script.
-func _floor_variant(x: int, y: int) -> int:
+## references RockTileSet's variant counts, which don't compile under --script. Static so the
+## smooth-walls renderer bakes the identical floor.
+static func floor_variant(x: int, y: int) -> int:
 	var h := absi((x * 73856093) ^ (y * 19349663))
 	if h % 17 == 0:
 		return RockTileSet.FLOOR_BASE_VARIANTS + (h % RockTileSet.FLOOR_DETAIL_VARIANTS)

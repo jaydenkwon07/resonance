@@ -102,6 +102,13 @@ static func _blob_configs() -> Array:
 	return out
 
 
+## Atlas coord of the fully-interior rock tile (rock on all eight sides): pure body, no seam or
+## bevel. The smooth-walls renderer (RoomWalls) repeats it as the rock fill.
+static func interior_rock_atlas() -> Vector2i:
+	var all := S_TOP | S_RIGHT | S_BOTTOM | S_LEFT
+	return _rock_coord(_blob_configs().find([all, C_TR | C_BR | C_BL | C_TL]))
+
+
 static func _rock_coord(index: int) -> Vector2i:
 	return Vector2i(index % ROCK_COLS, ROCK_ROW_START + index / ROCK_COLS)
 
