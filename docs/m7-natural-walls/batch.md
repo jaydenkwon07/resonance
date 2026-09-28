@@ -239,3 +239,43 @@ the stitch), dark at `[44,8]` `[36,8]` `[20,7]` `[15,4]`, 2× close-ups of cols 
   the same sameness as Overlook v1.
 - **The bridge is dead straight** for 7 tiles (the gate zone pins it). Reads as built — arguably
   right for a bridge.
+
+**Ruling (owner, 2026-09-28): reshape the west rims before approval.**
+
+## The Span — round 2 proposal (v2)
+
+**v2:** v1 with the west chamber (cols 0–31) redrawn by hand as low-frequency profiles instead of
+generated notches. The v1 lobes came from depth alternating in/out every 2–3 tiles; v2 changes depth
+by one per 2–3 tile segment, so walls run as slopes (still no unit steps, still ≤3 per run), and
+puts the medium features on alternating walls: top — an alcove up into the border at cols 10–12
+and a hanging rock mass sloping to 3 deep at cols 26–28 by the fissure; bottom — an alcove down at
+cols 4–6 and a floor mass rising 3 deep at cols 12–19; west wall — one alcove at rows 8–10. East
+chamber, fissure and bridge unchanged. **0 wall findings; rock 29.4% (in band) + 14.7% chasm;** gate
+seal holds (shut → Door C unreachable from `from_choir`; open → reachable); fixed points on floor;
+polygon checks clean; narrowest 59 px.
+
+```
+###############..###############################################
+##########...##..###############vvvvvvvvvvvvvvvv##...###########
+#######..............###########vvvvvvvvvvvvvvvvv#......##..####
+####...................#########..vvvvvvvvvvvvvvv#..........####
+###.......................###.....vvvvvvvvvvvvv.............####
+##................................vvvvvvvvvvvvv..............###
+##...................................vvvvvvv.................###
+##............................................................##
+#...............................................................
+#...............................................................
+#....................................vvvvvvv..................##
+##................................vvvvvvvvvvvv.................#
+##................................vvvvvvvvvvvv.................#
+##.............###...............vvvvvvvvvvvvv.................#
+###.........########.............vvvvvvvvvvvvvvvv.........##..##
+####......#############...###...###vvvvvvvvvvvvvv.......####..##
+####...##########################vvvvvvvvvvvvvv####..###########
+################################################################
+```
+
+**Captures (v2):** `span-v2-full-lit` / `-full-dark`, dark at `[20,7]` `[6,12]` `[28,4]`, 2× close-ups
+of the west chamber. The west chamber reads as one organic shape — broad rounded west end, the floor
+mass rising mid-bottom, the hanging rock at the fissure — with no run of lobes. **The east chamber
+still carries v1's generated notches** (two small ones top-right, a lobe bottom-right).
