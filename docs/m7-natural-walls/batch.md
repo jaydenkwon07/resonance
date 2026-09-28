@@ -187,3 +187,55 @@ on floor: `from_drip` [14,3], `from_stair` [14,14], chime `door_omega_frag2` [8,
 pickups, props or gates. Polygon checks clean (narrowest 59 px); parity fixture regenerated;
 `check_all.sh` 16/16. Captures of record: the v2 set above (same grid). Next in the batch: the
 Span — its `NoteRegistry` prerequisite first.
+
+## The Span (`room_span`) — round 1 proposal (v1)
+
+**Prerequisite done first (`341cdff`):** internal `ability_gates[].note` is now checked by the
+`RoomGraph` boot check and by `lint_rooms` (proved by typo-ing the Span's gate: both fire).
+
+**Before (grey-box open box):** 6 `straight_run`, rock 26.4%. The `n_mend` gate at [40,8] blocked
+nothing — the player could walk round it.
+
+**v1:** a crossing. The fissure (`v`, cols 32–48) runs the full height, top rock to bottom rock,
+and narrows to cols 37–43 at rows 6 and 10; the collapsed bridge is rows 7–9 across it — exactly
+under the gate's 72×90 px slab (cols 39.3–41.7, rows 7–9) and inside its exempt zone, so the lint
+leaves it straight. West chamber: Door C (top, cols 15–16) and its chime [20,7]; east chamber: the
+arrival from the Choir. Rims and fissure lips are built from 2–3 tile segments by a scratch
+generator (segments ≥2 can't make teeth or unit staircases; ≤3 keeps runs under the limit), then
+hand-fixed (one tooth, two runs, a pinch in Door C's approach). **0 wall findings, 0 teeth; rock
+27.0% — inside the band — + 14.7% chasm.** Fixed points unchanged and on floor; polygon checks
+clean; narrowest 59 px. **Gate seal (polygon flood fill from the `from_choir` landing): gate shut →
+Door C unreachable; open → reachable.**
+
+```
+###############..###############################################
+############..#..####..#####..##vvvvvvvvvvvvvvvv##...###########
+#..##..#####...........#####....vvvvvvvvvvvvvvvvv#......##..####
+#..##..##..............###........vvvvvvvvvvvvvvv#..........####
+#.................................vvvvvvvvvvvvv.............####
+##................................vvvvvvvvvvvvv..............###
+##...................................vvvvvvv.................###
+###...........................................................##
+###.............................................................
+###.............................................................
+##...................................vvvvvvv..................##
+##................................vvvvvvvvvvvv.................#
+##................................vvvvvvvvvvvv.................#
+#................................vvvvvvvvvvvvv.................#
+#...##....##.........##..........vvvvvvvvvvvvvvvv.........##..##
+##..##....##...###...####.......###vvvvvvvvvvvvvv.......####..##
+######..###################..####vvvvvvvvvvvvvv####..###########
+################################################################
+```
+
+**Captures (v1):** `span-v1-full-lit` / `-full-dark` (whole room stitched — two player figures is
+the stitch), dark at `[44,8]` `[36,8]` `[20,7]` `[15,4]`, 2× close-ups of cols 28–51.
+
+- **Reads as a crossing** — two chambers joined by one bridge through the fissure's neck.
+- **The fissure draws as rock** above and below the bridge (expected; `v` is data only).
+- **The gate is invisible** (open item: `AbilityGate` draws nothing) — a stranger meets an unmarked
+  wall mid-bridge.
+- **The west rims scallop** — the bottom-left especially reads as a row of evenly spaced lobes,
+  the same sameness as Overlook v1.
+- **The bridge is dead straight** for 7 tiles (the gate zone pins it). Reads as built — arguably
+  right for a bridge.
