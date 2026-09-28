@@ -95,6 +95,21 @@ def _walled(grid: list[str], geometry: str = "natural", links: list | None = Non
 	}
 
 
+def chasm() -> None:
+	"""`v` marks a chasm: rock for collision, walls and every wall rule, but its own share of the
+	rock budget, so a ledge room isn't failed for the hole it overlooks."""
+	box = ["##########", "##########", "#........#", "#........#", "#........#",
+	       "#........#", "#........#", "#........#", "##########"]
+	hole = list(box); hole[4] = hole[5] = "#...vv...#"
+	errors, warnings = lint_room(_walled(hole))
+	check(not has(errors, "outside"), "a chasm cell is a legal grid character")
+	check(not has(warnings, "tooth"), "a 2×2 chasm passes the tooth rule like a 2×2 rock mass")
+	check(has(warnings, "chasm 4.4%"), "the chasm is reported as its own share of the bounds")
+	check(has(warnings, "rock 46.7% excl"), "the chasm is left out of the rock budget")
+	fin = list(box); fin[4] = "#...v....#"
+	check(has(lint_room(_walled(fin))[1], "tooth at (4, 4)"), "a 1-tile chasm fin warns tooth, as rock")
+
+
 def walls() -> None:
 	"""Natural-walls rules 1–3 (M7 natural-walls step): one grid that must warn and one that
 	must not per rule, plus the exemptions and the baseline."""
@@ -142,6 +157,7 @@ def walls() -> None:
 	check(has(lint_room(_walled(fin))[1], "tooth at (4, 4)"), "a 1-tile rock fin warns tooth")
 	mass = list(box); mass[4] = mass[5] = "#...##...#"  # the same rock as a 2×2 mass, 2 clear all round
 	check(not has(lint_room(_walled(mass))[1], "tooth"), "a 2×2 rock mass passes")
+	chasm()
 	slot = list(box); slot[1] = "####.#####"          # a 1-wide notch up into the ceiling
 	check(has(lint_room(_walled(slot))[1], "tooth at (4, 1)"), "a 1-tile floor slot warns tooth")
 	alcove = list(box); alcove[1] = "###..#####"      # the same notch 2 wide
@@ -175,7 +191,7 @@ def main() -> int:
 
 	# Bad grid character.
 	r = clone(); set_cell(r, 5, 5, "X")
-	check(has(lint_room(r)[0], "outside '#.o'"), "a stray grid character is an error")
+	check(has(lint_room(r)[0], "outside '#.ov'"), "a stray grid character is an error")
 
 	# Ragged row.
 	r = clone(); r["grid"][3] = r["grid"][3] + "."

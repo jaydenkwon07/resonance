@@ -60,17 +60,18 @@ content scales with doors/links/objects.
 **Author subtractively.** Start as solid rock (`#`) in the `size_tiles` bounds and carve the
 walkable space (`.`). Natural rooms are irregular and asymmetric — a shape, not a rectangle.
 
-Grid characters (the only three; anything else is a lint error):
+Grid characters (the only four; anything else is a lint error):
 
 | char | meaning |
 |---|---|
 | `#` | rock — wall, collision, light occluder |
 | `.` | floor — walkable |
 | `o` | interior outcrop — **rock** for terrain and collision, counted apart for the rock budget |
+| `v` | chasm — **rock** for collision, walls, light and every wall rule today; marked so a later renderer can draw depth and let light through. Reported apart, outside the rock budget (owner, 2026-09-28) |
 
 Rules the lint enforces or reports, all from doing this by hand before the tool existed:
 
-- **Rock budget 20–30%** of the bounds, excluding outcrops (a warning, not an error). Long thin
+- **Rock budget 20–30%** of the bounds, excluding outcrops and chasm (a warning, not an error). Long thin
   rooms run naturally high — a 96×18 room is ~22% wall before any carving, so the Gallery sits
   at 30.5% by design and the threshold was **not** moved. Leave rock the player never reaches.
 - **Openings are 2 tiles wide.** A link/sealed-door `at` cell plus its neighbour along the edge

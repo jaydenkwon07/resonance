@@ -30,7 +30,7 @@ from roomlib import MOUTH_DEPTH, ROOMS_DIR
 
 BASELINE = roomlib.ROOT / "data" / "lint_baseline.json"
 WALL_RULES = ("straight_run", "staircase", "pipe", "tooth")
-ROCK_TARGET = (0.20, 0.30)  # fraction of the bounds left as rock, excluding outcrops (§5, §7)
+ROCK_TARGET = (0.20, 0.30)  # fraction of the bounds left as rock, excluding outcrops and chasm
 
 
 def lint_room(data: dict, accepted: list | None = None) -> tuple[list[str], list[str]]:
@@ -55,9 +55,9 @@ def lint_room(data: dict, accepted: list | None = None) -> tuple[list[str], list
 	ragged = [i for i, row in enumerate(grid) if len(row) != cols]
 	if ragged:
 		errors.append(f"rows {ragged} are not {cols} wide (grid is ragged)")
-	bad = sorted({ch for row in grid for ch in row if ch not in "#.o"})
+	bad = sorted({ch for row in grid for ch in row if ch not in "#.ov"})
 	if bad:
-		errors.append(f"grid has characters outside '#.o': {bad}")
+		errors.append(f"grid has characters outside '#.ov': {bad}")
 
 	# A ragged or empty grid makes cell lookups meaningless — stop before the geometry rules.
 	if not rows or ragged:
@@ -148,17 +148,20 @@ def lint_room(data: dict, accepted: list | None = None) -> tuple[list[str], list
 
 	# --- Rock percentage (report; warn if the target is missed) ---
 	total = rows * cols
-	rock = sum(row.count("#") + row.count("o") for row in grid)
+	# A chasm (`v`) is rock to everything else, but it's a hole the room is built around, not
+	# wall, so it gets its own share instead of counting against the budget.
+	wall = sum(row.count("#") for row in grid)
 	outcrop = sum(row.count("o") for row in grid)
-	excl = (rock - outcrop) / total if total else 0.0
-	incl = rock / total if total else 0.0
-	warnings.append(
-		f"rock {excl * 100:.1f}% excl outcrops / {incl * 100:.1f}% incl "
-		f"(target {int(ROCK_TARGET[0] * 100)}–{int(ROCK_TARGET[1] * 100)}% excl)"
-	)
+	chasm = sum(row.count("v") for row in grid)
+	excl = wall / total if total else 0.0
+	incl = (wall + outcrop) / total if total else 0.0
+	msg = f"rock {excl * 100:.1f}% excl outcrops / {incl * 100:.1f}% incl "
+	if chasm:
+		msg += f"(chasm {chasm / total * 100:.1f}% on top) "
+	warnings.append(msg + f"(target {int(ROCK_TARGET[0] * 100)}–{int(ROCK_TARGET[1] * 100)}% excl)")
 	if not ROCK_TARGET[0] <= excl <= ROCK_TARGET[1]:
 		warnings.append(
-			f"rock {excl * 100:.1f}% (excl outcrops) is outside the "
+			f"rock {excl * 100:.1f}% (excl outcrops and chasm) is outside the "
 			f"{int(ROCK_TARGET[0] * 100)}–{int(ROCK_TARGET[1] * 100)}% target"
 		)
 
