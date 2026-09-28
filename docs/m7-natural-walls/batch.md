@@ -180,3 +180,10 @@ cols 2–19, rows 3–14. Grid written in for the run and restored after.
 - **Nubs** at the N and S mouths' east sides (cols 16–17) — the landing needs cols 14–15, and the
   lip can't step back in faster than 3.
 - **Stair inheritance:** chasm cols 10–29 — the Stair must keep a shaft open under them.
+
+**Ruling (owner, 2026-09-28): v2 APPROVED as drawn** — rock 38.2% (+ 40.1% chasm), the top/bottom
+near-symmetry and the mouth nubs accepted. Applied to `room_overlook.json`. Content re-checked, all
+on floor: `from_drip` [14,3], `from_stair` [14,14], chime `door_omega_frag2` [8,12], both links; no
+pickups, props or gates. Polygon checks clean (narrowest 59 px); parity fixture regenerated;
+`check_all.sh` 16/16. Captures of record: the v2 set above (same grid). Next in the batch: the
+Span — its `NoteRegistry` prerequisite first.
