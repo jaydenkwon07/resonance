@@ -33,9 +33,12 @@ WALL_RULES = ("straight_run", "staircase", "pipe", "tooth")
 ROCK_TARGET = (0.20, 0.30)  # fraction of the bounds left as rock, excluding outcrops and chasm
 
 
-def lint_room(data: dict, accepted: list | None = None) -> tuple[list[str], list[str]]:
+def lint_room(
+	data: dict, accepted: list | None = None, known_notes: set[str] | None = None
+) -> tuple[list[str], list[str]]:
 	"""Return (errors, warnings) for one room geometry dict. Pure — no I/O — so a fixture can
-	drive it. `accepted` is this room's baseline entries; wall findings in it are not warned."""
+	drive it. `accepted` is this room's baseline entries; wall findings in it are not warned.
+	`known_notes` (note ids from notes.json) enables the ability-gate note check."""
 	errors: list[str] = []
 	warnings: list[str] = []
 
@@ -98,6 +101,15 @@ def lint_room(data: dict, accepted: list | None = None) -> tuple[list[str], list
 	check_on_floor(data.get("pickups", []), "pickup", "note_id")
 	check_on_floor(data.get("chimes", []), "chime", "melody_id")
 	check_on_floor(data.get("props", []), "prop", "at")
+
+	# --- Internal ability gates name a real note (errors) ---
+	# validate_rooms reads only the graph, so this is the one Python check on them: a typo'd
+	# note would build a blocker no note ever lifts.
+	if known_notes is not None:
+		for gate in data.get("ability_gates", []):
+			note = str(gate.get("note", ""))
+			if note not in known_notes:
+				errors.append(f"ability gate at {gate.get('at')} names unknown note '{note}'")
 
 	# --- Entry landings (errors) ---
 	links = data.get("links", [])
@@ -237,10 +249,12 @@ def main(argv: list[str]) -> int:
 		return 1
 	total_errors = 0
 	baseline = load_baseline()
+	notes_path = roomlib.ROOT / "data" / "notes.json"
+	known_notes = {n["id"] for n in json.loads(notes_path.read_text()).get("notes", [])}
 	for path in targets:
 		data = roomlib.load_room(path)
 		accepted = baseline.get(data.get("room_id", path.stem), [])
-		errors, warnings = lint_room(data, accepted)
+		errors, warnings = lint_room(data, accepted, known_notes)
 		total_errors += len(errors)
 		status = "FAIL" if errors else "ok  "
 		print(f"{status}  {path.name}")

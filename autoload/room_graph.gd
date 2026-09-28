@@ -144,6 +144,13 @@ func _check_room(room_id: String) -> void:
 		if not has_entry(room_id, str(entry_name)):
 			push_error("RoomGraph[%s]: geometry entry '%s' is not in the graph." % [room_id, entry_name])
 
+	# An internal ability gate is not a graph edge, so nothing above resolves its note; a typo
+	# would build a blocker no note ever lifts.
+	for gate in geo.get("ability_gates", []):
+		var gate_note := str(gate.get("note", ""))
+		if NoteRegistry.by_id(gate_note).is_empty():
+			push_error("RoomGraph[%s]: ability gate at %s names unknown note '%s'." % [room_id, gate.get("at"), gate_note])
+
 
 func _link_matches(links: Array, exit: Dictionary) -> bool:
 	for link in links:

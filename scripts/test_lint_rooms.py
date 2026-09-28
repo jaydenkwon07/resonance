@@ -110,6 +110,18 @@ def chasm() -> None:
 	check(has(lint_room(_walled(fin))[1], "tooth at (4, 4)"), "a 1-tile chasm fin warns tooth, as rock")
 
 
+def gate_notes() -> None:
+	"""An internal ability gate names a note id; nothing else resolves it, so a typo would build a
+	blocker no note ever lifts — a soft-lock the validator can't see (it reads only the graph)."""
+	room = _walled(["######", "#....#", "#....#", "######"])
+	room["ability_gates"] = [{"at": [2, 1], "note": "n_mend", "facing": [1, 0]}]
+	check(not has(lint_room(room, [], {"n_mend"})[0], "unknown note"), "a gate naming a known note passes")
+	room["ability_gates"][0]["note"] = "n_mnd"
+	check(has(lint_room(room, [], {"n_mend"})[0], "ability gate at [2, 1] names unknown note 'n_mnd'"),
+	      "a gate naming an unknown note is an error")
+	check(not has(lint_room(room)[0], "unknown note"), "without a note list the check is skipped")
+
+
 def walls() -> None:
 	"""Natural-walls rules 1–3 (M7 natural-walls step): one grid that must warn and one that
 	must not per rule, plus the exemptions and the baseline."""
@@ -158,6 +170,7 @@ def walls() -> None:
 	mass = list(box); mass[4] = mass[5] = "#...##...#"  # the same rock as a 2×2 mass, 2 clear all round
 	check(not has(lint_room(_walled(mass))[1], "tooth"), "a 2×2 rock mass passes")
 	chasm()
+	gate_notes()
 	slot = list(box); slot[1] = "####.#####"          # a 1-wide notch up into the ceiling
 	check(has(lint_room(_walled(slot))[1], "tooth at (4, 1)"), "a 1-tile floor slot warns tooth")
 	alcove = list(box); alcove[1] = "###..#####"      # the same notch 2 wide
