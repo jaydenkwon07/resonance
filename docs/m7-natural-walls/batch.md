@@ -279,3 +279,9 @@ polygon checks clean; narrowest 59 px.
 of the west chamber. The west chamber reads as one organic shape — broad rounded west end, the floor
 mass rising mid-bottom, the hanging rock at the fissure — with no run of lobes. **The east chamber
 still carries v1's generated notches** (two small ones top-right, a lobe bottom-right).
+
+**Ruling (owner, 2026-09-28): v2 APPROVED "for now"** — the east chamber keeps v1's generated
+notches for the moment. Applied to `room_span.json`. Content re-checked, all on floor: `from_choir`
+[62,8], `from_threshold` [15,4], chime `door_c` [20,7], the `n_mend` gate [40,8], both links. Parity
+fixture regenerated; `check_all.sh` 16/16. Captures of record: the v2 set. Open: the gate's
+grey-box look; the east chamber's notches.
