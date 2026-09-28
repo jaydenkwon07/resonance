@@ -285,3 +285,19 @@ notches for the moment. Applied to `room_span.json`. Content re-checked, all on 
 [62,8], `from_threshold` [15,4], chime `door_c` [20,7], the `n_mend` gate [40,8], both links. Parity
 fixture regenerated; `check_all.sh` 16/16. Captures of record: the v2 set. Open: the gate's
 grey-box look; the east chamber's notches.
+
+**Ruling (owner, 2026-09-28): a gap placeholder for ability gates, and a 2-row bridge.** Considered
+and not taken: a dedicated bridge room (it wouldn't fix the gate opening on ownership or its
+invisibility, would make the crossing a room edge like the Drip's, and changes the 11-room map).
+
+- **Gap placeholder.** `AbilityGate` now draws, while shut, its blocker footprint as a `rock_void`
+  gap with three `rock_mid` plank stubs reaching in from each approach side (oriented by `facing`),
+  and stops drawing when it opens. Applies to every ability gate — the Drip exit reads as a gap in
+  its slot too. Placeholder until M11. Captures: `span-v3-dark-46-8`, `span-v3-dark-34-8`,
+  `drip-gap-*`.
+- **2-row bridge.** Row 7 across the crossing (cols 37–43) is now chasm; the bridge is rows 8–9,
+  the 2-tile width of every opening, still wholly under the slab. 0 wall findings; rock 29.4% +
+  15.3% chasm; gate still seals; narrowest 59 px; parity fixture regenerated; `check_all.sh` 16/16.
+- **Cosmetic, open:** the gate is centred on cell [40,8] and the bridge is rows 8–9, so the gap box
+  pokes a tile above the bridge into the chasm (and one stub sits over chasm). Reads fine as a hole;
+  moving the gate to the bridge's centre is a data change left for the owner.

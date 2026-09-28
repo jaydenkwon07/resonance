@@ -220,7 +220,7 @@ never silently move) → `validate_rooms`, `seal_test`, `lint_rooms`, all Godot 
 
 ## Open items flagged to the owner, not yet ruled
 
-- **Ability gates are invisible in grey-box** (`AbilityGate` draws nothing): the Drip's key idea
+- **RESOLVED 2026-09-28 — a shut gate now draws a gap placeholder (see `docs/m7-natural-walls/batch.md`).** Was: **Ability gates are invisible in grey-box** (`AbilityGate` draws nothing): the Drip's key idea
   ("the exit is the gap you cross with note 2") can't be seen, and the stranger playthrough will
   bump into an invisible wall. A placeholder look needs an owner ruling (Godot visual).
 - **Note 1 visible from frame one** — recorded as an open M8 question in `hollow-pilot.md`
