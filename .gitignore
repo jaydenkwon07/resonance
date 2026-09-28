@@ -12,3 +12,6 @@ __pycache__/
 
 # Subagent-driven-development scratch (ledgers, briefs, review packages)
 .superpowers/
+
+CLAUDE.md.bak
+.claude/rules/

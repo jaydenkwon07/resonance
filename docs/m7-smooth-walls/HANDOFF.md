@@ -7,7 +7,7 @@ then this. Everything here is current as of the last commit named below; verify 
 
 ## Where M7 stands
 
-M7 is the grey-box map (CLAUDE.md §2, §8). Its spine is built: eleven rooms, connected, gated,
+M7 is the grey-box map (CLAUDE.md "Now" and "Milestone ladder"). Its spine is built: eleven rooms, connected, gated,
 validated. Since then, in order:
 
 1. **Room edges rewired to the Act 1 layout map** (`a3df734`): every transition now exits and
@@ -179,7 +179,7 @@ one source, `RockBevel` (`scripts/rock/rock_bevel.gd`, pure, 23 tests in
      loop (closed);
    - occluders: one `LightOccluder2D` + `OccluderPolygon2D` (closed) per loop, same points.
    - All three from the one vertex list (spec: "one source").
-5. Verify: `godot --headless --import`, all Godot tests (104 + new), `--quit-after 90` with both
+5. Verify: `godot --headless --import`, all Godot tests (`./scripts/check_all.sh`), `--quit-after 90` with both
    `--walls=bevel` and `--walls=smooth`, Python suites. Then step 3 captures.
 
 **Captures:** generalise `_capture_room.gd` to pass `--walls=` through (it instances
@@ -226,12 +226,12 @@ never silently move) → `validate_rooms`, `seal_test`, `lint_rooms`, all Godot 
 - **Note 1 visible from frame one** — recorded as an open M8 question in `hollow-pilot.md`
   (accept vs wake the pickup light at the low bend). The M7 playthrough tests it as-is.
 - `NoteRegistry` doesn't validate internal `ability_gates[].note` — must land **before the Span is
-  carved full-height** (CLAUDE.md §2).
+  carved full-height** (CLAUDE.md "Now").
 - `data/melodies/door_backtrack.json` is orphaned (loaded, referenced by nothing).
 - `scripts/new_room.py` doesn't register the room in `rooms.json` (spec said it would).
 - In true world coordinates the loop doesn't close (the Choir sits ~108 tiles below the Cistern,
   the Span beside it must sit ~36 below). Harmless now; matters if a map screen is ever built.
-- The CLAUDE.md §3 one-rule grep's `^\./` filter doesn't match this machine's grep output (ugrep
+- The CLAUDE.md "The one rule" grep's `^\./` filter doesn't match this machine's grep output (ugrep
   prints `tests/…`); it lists exempt test lines instead of nothing. Use `^(\./)?(tests|…)`.
 
 ## Still ahead in M7 after both steps

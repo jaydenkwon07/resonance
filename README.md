@@ -127,7 +127,7 @@ scenes/
   main.tscn/.gd       render root: 960×540 SubViewport upscaled by a Display TextureRect
   world.tscn/.gd      persistent gameplay host inside the viewport; room swap + camera clamp
   player/             8-direction movement, note input, the interact verb, growing light
-  rooms/room.gd       builds a room from data; rock_tileset.gd is the placeholder tileset
+  rooms/room.gd       builds a room from data; rock_atlas.gd generates the rock/floor look
   fx/                 note_ring, lighting (additive PointLight2D factory),
                       particle_burst, collect_flash
   ui/                 note_bar, instrument_overlay, instrument_keyboard (+ melody strip)

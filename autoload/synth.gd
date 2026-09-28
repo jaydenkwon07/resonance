@@ -13,6 +13,20 @@ extends Node
 ##
 ## Audio always plays, even in the instrument state (§6): this deliberately does
 ## NOT check NoteBus.effects_enabled() — only gameplay effects do.
+##
+## Tuned in M1. Three invariants here are load-bearing, not arbitrary — don't break them:
+## - The mix is divided by the SQUARE ROOT of the active voice count. Without it, five
+##   simultaneous notes exceed full scale and clip; dividing by the count instead would make a
+##   chord quieter than a single note. The divisor is eased so a starting or ending voice
+##   doesn't jump the scale of notes already sounding.
+## - Voice cleanup checks `env <= 0.0 AND age >= attack`. The age check is not redundant: a
+##   fade reading 0.0 at the START of an attack looks like 0.0 at the END of a decay, and
+##   testing the value alone once freed every voice on its first sample (the envelope bug).
+## - BUFFER_LENGTH is 0.04s, a deliberate latency-vs-dropout trade. Lower for more snap at the
+##   risk of crackle; don't change it incidentally.
+## The waveform itself is a plain sine and IS arbitrary — a placeholder for the instrument
+## voices the owner composes later. Swapping it is expected; do it behind NoteBus so nothing
+## else changes.
 
 const MIX_RATE := 44100.0
 ## Seconds of generator buffer. This is the play-to-hear latency: _process

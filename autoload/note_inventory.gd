@@ -1,5 +1,5 @@
 extends Node
-## What the player has collected, and how it maps to the overworld number-row
+## What the player has collected, and how it maps to the overworld palette's five
 ## slots. Replaces the fixed Palette (§7 Step 1): the player starts with NOTHING
 ## and gains a slot on each pickup — the design doc's cold open.
 ##

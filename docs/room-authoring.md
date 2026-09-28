@@ -5,8 +5,8 @@ from authoring the Gallery (`room_b`) in M6; it is the durable half of that mile
 process the nine remaining M7 rooms follow so their layout stops being nine sets of by-eye
 checks and hand-derived numbers.
 
-**CLAUDE.md is authoritative** for the *why* and the exact schema (§4 architecture, §5 data
-formats, §6 design constraints). This file is the *how* — the order of operations and the
+**CLAUDE.md and `.claude/rules/rooms.md` are authoritative** for the *why* and the exact schema
+(CLAUDE.md's invariants and owner's calls; `rooms.md`'s data, authoring and walls rules). This file is the *how* — the order of operations and the
 tools. Where they disagree, CLAUDE.md wins.
 
 ---
@@ -43,7 +43,7 @@ them in order; freeze the shape before anything downstream assumes it.
 2. **Content and wiring** — pickups, chimes, doors, sealed doors, placed on valid floor outside
    the reserved zones. Validator, seal test and boot check green. Owner walks the room and its
    neighbours.
-3. **Light** — under M5's ruling (§2): no static lights; every object emits its own glow; doors
+3. **Light** — under M5's ruling (`.claude/rules/lighting.md`): no static lights; every object emits its own glow; doors
    are the beacons. A room with no doors/chimes may cost ≈ nothing here — **that is a finding,
    record it**, don't invent a light source to fill the dark (new vocabulary is a stop-and-ask).
 4. **Detail** — rubble props only, under a per-room cap the owner sets. Cracks/finer detail are
@@ -135,15 +135,15 @@ python3 scripts/seal_test.py                    # each door closed seals its edg
 python3 scripts/lint_rooms.py [room_id …]       # per-room geometry checks (below)
 ```
 
-Plus the whole test suite (`tests/test_*.gd`, 104) and the one-rule grep from CLAUDE.md §3
-(no pitch literal in any gameplay `.gd`) before freezing or committing.
+Plus the whole test suite and the one-rule grep from CLAUDE.md's "The one rule" (no pitch
+literal in any gameplay `.gd`) before freezing or committing — `./scripts/check_all.sh` runs both.
 
 `lint_rooms.py` turns the by-eye checks into machine checks. **Errors** (non-zero exit) are
 structural — the room would not work: grid integrity, non-perimeter or non-floor openings,
 content off floor / out of bounds, a `from_*` landing on rock, content inside a door's derived
 footprint/approach. **Warnings** (zero exit) are convention and quality: a blocked exit mouth, rock %
-off target. Legacy grey-box rooms (`room_c`, `room_d`) trip warnings on purpose until M7
-rebuilds them. Green — no errors — is the bar before a shape is frozen.
+off target. (The legacy grey-box rooms `room_c`/`room_d`, which tripped warnings on
+purpose, were retired in M7.) Green — no errors — is the bar before a shape is frozen.
 
 The door/opening/landing maths lives once, in `roomlib.py` (the Python mirror of
 `RoomGeometry`); `seal_test.py` and `lint_rooms.py` both import it. Keep its constants in step
