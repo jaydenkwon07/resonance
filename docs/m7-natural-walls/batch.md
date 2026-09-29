@@ -473,3 +473,18 @@ figures are the stitch), dark at `[60,5]` `[59,20]` `[48,30]`.
   doors; parity fixture regenerated; `check_all.sh` 17/17.
 - **Added chimes: pending** — a chime plays a melody, and what the new ones play is musical content;
   asked the owner.
+- **Added chimes (owner, 2026-09-28): echo fragment 3.** Two more `door_omega_frag3` chimes, so the
+  Choir's three stand at three heights: **[70,8]** high, under the shaft; **[24,19]** mid-height in
+  the empty west half; **[84,26]** low in the east. No new melody data. On floor, lint and polygon
+  checks clean, `check_all.sh` 17/17. Capture: `choir-final-full-lit` / `-full-dark`.
+
+## Natural-walls batch — DONE (2026-09-28)
+
+All six natural rooms are through review with zero `straight_run` / `staircase` / `pipe` / `tooth`
+warnings outside the baseline: Hollow v5, Drip v4, Overlook v2, Span v2 (+2-row bridge), Stair v1,
+Choir v2. Every content cell re-checked; the only content moved was by owner ruling (the Choir's
+fragment chime, plus two added). Additions along the way: the chasm character `v`, the internal
+gate-note check, and the ability-gate gap placeholder. Carried open: chasms render as rock (M8/M9);
+the gate opens on ownership, so the Span's "mend" beat doesn't exist until M11; the Span gate sits
+a tile above its bridge's centre; the Span's east chamber keeps generated notches; the Choir reads
+as a hall more than "tall". Next in M7: archetype carving of Threshold, Antechamber, Resonance.
