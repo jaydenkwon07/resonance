@@ -216,6 +216,52 @@ never silently move) → `validate_rooms`, `seal_test`, `lint_rooms`, all Godot 
   may flag the aisles as pipes — baseline them, don't fix), chimes at different heights, note 3 at
   the bottom, sealed passage east. Carved rooms get no reshaping.
 
+**The batch is DONE (2026-09-28)** — record in `docs/m7-natural-walls/batch.md`.
+
+---
+
+## Authoring a room proposal — the method that worked (2026-09-28)
+
+Learned across the Overlook, Span, Stair and Choir. Applies to the carved rooms next, minus the
+natural-wall rules.
+
+**The loop, per room:** draft in scratch → check → capture → record the round in `batch.md` → owner
+rules → apply → re-check every content cell → `python3 scripts/export_wall_loops.py` →
+`./scripts/check_all.sh` → commit. The owner reviews captures before approving; the room file is
+not changed until a ruling.
+
+**Drawing rims:**
+- Use **low-frequency depth profiles**: depth changes by 1 per 2–3 tile segment, building a few
+  big bends, with medium features (an alcove, a mass) on alternating walls. Random 2–3 tile notches
+  pass the lint but render as a row of evenly spaced lobes — Overlook v1, Span v1 and Choir v1 all
+  failed review that way.
+- Segments of ≥2 can't make teeth or unit staircases; ≤3 keeps runs under the straight-run limit;
+  depth steps of ≤3 keep the horizontal runs at each step under it too.
+- Pin only the cells that must be floor next to an opening or door approach. Pinning a whole range
+  to one depth makes a long straight run beside it.
+- Chasms are `v`. An internal gate's crossing must sit inside its slab (72×90 px, centred on the
+  gate's cell) and its exempt zone (slab ±2 along `facing`).
+
+**Checking a draft** (before capturing): the lint with the note list; the wall-polygon checks
+`check_all.sh` does not run — `walls.loop_problems`, `footprint_problems`, `pin_problems`,
+`seal_problems`; for an internal gate, a `walls.reach` flood fill from each landing with its slab
+shut vs open (`seal_problems` only closes doored/`requires` links). `scripts/check_room.py` wraps all
+of this (`--grid FILE` checks a candidate without touching the room file). **As of 2026-09-29 it is
+uncommitted:** its test takes minutes and would slow `check_all.sh`, so it needs a lighter fixture
+first. `walls.narrowest` and the flood fills are slow on big rooms (the Choir and Cistern take
+minutes) — don't loop them, and ask the owner before a long run.
+
+**Captures for review:** write the grid into the room file, capture windowed, restore the room file
+(`json.dumps(d, indent=2) + "\n"` round-trips the room files byte-identically). Godot on the command
+line is `/Applications/Godot.app/Contents/MacOS/Godot` (`godot` is a shell alias). Flags are
+`--key=value` only: a bare `--full` is ignored, the scene falls through to the shot path with no
+`--at`, errors, and stays open — use `--full=1`, and wrap runs in a watchdog
+(`perl -e 'alarm 150; exec @ARGV' <godot> …`). Check `project.godot` is unchanged afterwards. The
+captures' `.import` files appear on the next import; commit them with the PNGs.
+
+**Pushing:** a push carrying capture PNGs fails with HTTP 400 on the default buffer —
+`git -c http.postBuffer=157286400 push origin main`. Push only when the owner asks.
+
 ---
 
 ## Open items flagged to the owner, not yet ruled
