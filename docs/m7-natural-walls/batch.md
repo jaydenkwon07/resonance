@@ -384,3 +384,10 @@ and 43–44; the west wall's outcrops stagger against them. **0 wall findings, 0
 - **The Overlook seam:** the Overlook's rows 16–17 under its chasm are `#`, so the Overlook→Stair
   shaft is cut at the seam. Opening them is a two-row data edit to an approved room — owner's call.
   The Choir also needs its chime under the shaft for the light to line up (a content move).
+
+**Ruling (owner, 2026-09-28): v1 APPROVED "for now"** — the shaft not reading as a drop is the
+chasm render limitation, left to M8/M9. Applied to `room_stair.json`. Content re-checked, all on
+floor: `from_overlook` [14,3], `from_choir` [14,49], chime `door_b` [10,26], both links. Parity
+fixture regenerated; `check_all.sh` 17/17 (incl. the owner's new `test_room_cycle.gd`). Still open:
+the Overlook seam (its rows 16–17 under the chasm are `#`) and the Choir's chime placement under the
+shaft. Next in the batch: the Choir.
