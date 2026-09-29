@@ -459,3 +459,17 @@ figures are the stitch), dark at `[60,5]` `[59,20]` `[48,30]`.
   shaft, but the only chime is at [30,10], outside cols 64–75; (2) the spec says "chimes at
   different heights" and the room has one; (3) the Overlook seam — its rows 16–17 under the chasm
   are `#`.
+
+**Rulings (owner, 2026-09-28): Choir v2 applied; move the chime; add chimes; convert the seam.**
+
+- **Choir v2 applied** to `room_choir.json`.
+- **Chime moved:** `door_omega_frag3` from [30,10] to **[70,8]**, directly under the shaft mouth's
+  deepest point (cols 69–71, row 6) so its light can rise through the shaft; one tile clear of the
+  lip, clear of the nave's columns. Content moved by owner ruling, not to satisfy a rule.
+- **Overlook seam converted:** the Overlook's rows 16–17, cols 17–29 (under its chasm) are now `v`,
+  so the chasm runs Overlook → Stair (its rows 0–1 were already `v`) → Choir. Overlook wall rock
+  38.2% → 33.7%; still 0 wall findings.
+- Both rooms: 0 wall findings, polygon checks clean, narrowest 59 px; `validate_rooms` 11 rooms / 4
+  doors; parity fixture regenerated; `check_all.sh` 17/17.
+- **Added chimes: pending** — a chime plays a melody, and what the new ones play is musical content;
+  asked the owner.
