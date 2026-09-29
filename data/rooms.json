@@ -3,7 +3,7 @@
   "rooms": {
     "room_hollow":      { "display_name": "Hollow", "notes": ["n_break"], "entries": ["spawn", "from_cistern"],
                           "exits": [ { "to": "room_a", "to_entry": "from_hollow" } ] },
-    "room_a":           { "display_name": "Cistern", "notes": [], "entries": ["spawn", "from_hollow", "from_gallery", "from_antechamber"],
+    "room_a":           { "display_name": "Cistern", "notes": [], "entries": ["spawn", "from_hollow", "from_gallery", "from_antechamber", "from_threshold"],
                           "exits": [ { "to": "room_hollow", "to_entry": "from_cistern" },
                                      { "to": "room_b", "to_entry": "from_a", "door": "door_tutorial" },
                                      { "to": "room_antechamber", "to_entry": "from_cistern", "door": "door_omega" } ] },
@@ -26,7 +26,8 @@
                           "exits": [ { "to": "room_choir", "to_entry": "from_span" },
                                      { "to": "room_threshold", "to_entry": "from_span", "door": "door_c" } ] },
     "room_threshold":   { "display_name": "Threshold", "notes": [], "entries": ["from_span"],
-                          "exits": [ { "to": "room_span", "to_entry": "from_threshold" } ] },
+                          "exits": [ { "to": "room_span", "to_entry": "from_threshold" },
+                                     { "to": "room_a", "to_entry": "from_threshold" } ] },
     "room_antechamber": { "display_name": "Antechamber", "notes": [], "entries": ["from_cistern", "from_resonance"],
                           "exits": [ { "to": "room_a", "to_entry": "from_antechamber" },
                                      { "to": "room_resonance", "to_entry": "from_antechamber" } ] },

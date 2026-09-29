@@ -196,7 +196,7 @@ def main() -> int:
 	# Baseline: the reference room is error-clean.
 	errors, warnings = lint_room(BASE)
 	check(errors == [], "room_a has no errors")
-	check(has(warnings, "rock 29.9% excl"), "room_a reports its rock percentage")
+	check(has(warnings, "rock 29.7% excl"), "room_a reports its rock percentage")
 
 	# size_tiles mismatch.
 	r = clone(); r["size_tiles"] = [47, 36]
