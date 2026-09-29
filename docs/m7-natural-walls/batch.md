@@ -301,3 +301,86 @@ invisibility, would make the crossing a room edge like the Drip's, and changes t
 - **Cosmetic, open:** the gate is centred on cell [40,8] and the bridge is rows 8–9, so the gap box
   pokes a tile above the bridge into the chasm (and one stub sits over chasm). Reads fine as a hole;
   moving the gate to the bridge's centre is a data change left for the owner.
+
+## The Stair (`room_stair`) — round 1 proposal (v1)
+
+**Before (grey-box open box):** 6 `straight_run`, rock 18.5%.
+
+**v1:** a shaft. A `v` band runs edge to edge down the east (the shaft under the Overlook's chasm
+columns; rows 0–1 and 52–53 open to the room edges so it continues into both neighbours), and the
+descent winds down the west side from the top opening to Door B. Both edges are 2–3 row segments
+from a scratch generator with momentum (so bends are long, not alternating), hand-fixed at the
+bottom where Door B's approach pinned 4-row runs. Ledges jut into the shaft at rows 18–21, 30–35
+and 43–44; the west wall's outcrops stagger against them. **0 wall findings, 0 teeth; rock 32.1% +
+36.6% chasm.** Fixed points on floor (`from_overlook` [14,3], `from_choir` [14,49], chime `door_b`
+[10,26], both openings); polygon checks clean incl. Door B's seal; narrowest 59 px.
+
+```
+##############..##vvvvvvvvvvvv##
+##############..##vvvvvvvvvvvv##
+###########......vvvvvvvvvvvvv##
+###########......vvvvvvvvvvvvv##
+###########.......vvvvvvvvvvvv##
+########..........vvvvvvvvvvvv##
+########.........vvvvvvvvvvvvv##
+########.........vvvvvvvvvvvvv##
+######..........vvvvvvvvvvvvvv##
+######..........vvvvvvvvvvvvvv##
+#######.........vvvvvvvvvvvvvv##
+#######..........vvvvvvvvvvvvv##
+########.........vvvvvvvvvvvvv##
+########.........vvvvvvvvvvvvv##
+########..........vvvvvvvvvvvv##
+######............vvvvvvvvvvvv##
+######...........vvvvvvvvvvvvv##
+######...........vvvvvvvvvvvvv##
+####................vvvvvvvvvv##
+####................vvvvvvvvvv##
+####..................vvvvvvvv##
+###...................vvvvvvvv##
+###.................vvvvvvvvvv##
+####................vvvvvvvvvv##
+####...............vvvvvvvvvvv##
+######.............vvvvvvvvvvv##
+######.............vvvvvvvvvvv##
+######............vvvvvvvvvvvv##
+#########.........vvvvvvvvvvvv##
+#########.........vvvvvvvvvvvv##
+#########..........vvvvvvvvvvv##
+#######............vvvvvvvvvvv##
+#######............vvvvvvvvvvv##
+##########..........vvvvvvvvvv##
+##########..........vvvvvvvvvv##
+##########..........vvvvvvvvvv##
+#########.........vvvvvvvvvvvv##
+#########.........vvvvvvvvvvvv##
+#########.......vvvvvvvvvvvvvv##
+#######.........vvvvvvvvvvvvvv##
+#######...........vvvvvvvvvvvv##
+######............vvvvvvvvvvvv##
+######............vvvvvvvvvvvv##
+#######.............vvvvvvvvvv##
+#######.............vvvvvvvvvv##
+##########..........vvvvvvvvvv##
+##########.......vvvvvvvvvvvvv##
+##########.......vvvvvvvvvvvvv##
+###########.......vvvvvvvvvvvv##
+###########.......vvvvvvvvvvvv##
+############.......vvvvvvvvvvv##
+############.......vvvvvvvvvvv##
+##############..##vvvvvvvvvvvv##
+##############..##vvvvvvvvvvvv##
+```
+
+**Captures (v1):** `stair-v1-full-lit` / `-full-dark` (three screens stitched), dark at `[10,26]`
+`[14,5]` `[14,45]`, 2× close-ups of rows 18–33.
+
+- **Reads as a winding cave corridor, not a shaft** — `v` draws as rock, so the drop beside the path
+  is invisible (the M8/M9 renderer question again).
+- **Ledges are modest** — only rows 18–21 clearly juts; the others read as ordinary bumps.
+- **Ledges are one-sided** — the shaft is east, so ledges only jut from the path's side; the
+  stagger comes from the west wall. The spec's "staggered ledges" may have meant alternating sides.
+- **The east lip bumps more often than the west wall**, though with bigger swings than Overlook v1.
+- **The Overlook seam:** the Overlook's rows 16–17 under its chasm are `#`, so the Overlook→Stair
+  shaft is cut at the seam. Opening them is a two-row data edit to an approved room — owner's call.
+  The Choir also needs its chime under the shaft for the light to line up (a content move).
