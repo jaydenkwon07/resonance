@@ -52,6 +52,8 @@ M7, and M7's gate must not be waived in turn.
 
 ## Long rationale
 
+**Debug room jumping in-game (F2/F3/F4), 2026-09-28.** M7's jump-to-room started command-line only (`--room=`), "never a key", to keep debug out of the shipped input path. The owner chose an in-game switcher anyway: relaunching per room was the friction when reviewing eleven rooms. It stays out of shipped builds by being registered only when `OS.is_debug_build()` — the same guarantee by a different mechanism. F-keys because every letter, the number row, `[ ]`, Tab and backtick are taken or reserved; F1 stays reserved for the key reference. The separate no-capture-key ruling (M6) is unchanged.
+
 **Colour: four shades per category, rejected.** Four shades of one hue per category were
 indistinguishable on a 6px door gem against a dark background; one contiguous hue arc per
 category keeps twelve distinct hues so a single note stays identifiable while the family reads

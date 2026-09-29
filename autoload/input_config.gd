@@ -47,6 +47,14 @@ const SYSTEM := {
 	"octave_up": [KEY_BRACKETRIGHT],
 }
 
+## Debug room jumping (World): previous / next room, next entry in this room. Registered only
+## in debug builds, so an export has no such actions. F1 stays reserved for the key reference.
+const DEBUG := {
+	"debug_room_prev": [KEY_F2],
+	"debug_room_next": [KEY_F3],
+	"debug_entry_next": [KEY_F4],
+}
+
 ## Overworld palette action names are PALETTE_ACTION_PREFIX + slot index. The keys
 ## they bind to are DATA (keyboard_layout.json), mirrored to the movement layout.
 const PALETTE_ACTION_PREFIX := "note_slot_"
@@ -174,9 +182,10 @@ func _load_keyboard_layout() -> void:
 
 
 func _register_system() -> void:
-	for action in SYSTEM:
+	var table := SYSTEM.merged(DEBUG) if OS.is_debug_build() else SYSTEM
+	for action in table:
 		_reset_action(action)
-		for keycode in SYSTEM[action]:
+		for keycode in table[action]:
 			_add_key(action, keycode)
 
 

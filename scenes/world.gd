@@ -13,6 +13,7 @@ extends Node2D
 @onready var debug_label: Label = $UI/DebugLabel
 
 var _current_room: Room = null
+var _current_entry: String = ""
 
 ## Debug lighting toggle: backtick flips the world CanvasModulate to full-bright so the
 ## room can be walked fully lit. Added for the M5 3d scale/darkness check (verdict: scale
@@ -54,9 +55,9 @@ func _ready() -> void:
 
 
 ## Debug jump-to-room for reviewing rooms (M7 spec §6 Step 0):
-## `godot . -- --room=<id> [--spawn=<entry>]`. Command-line only, never a key, so it stays
-## out of the shipped input path. Without --spawn it lands on the room's first authored entry
-## rather than the room centre, which in a carved room is likely rock.
+## `godot . -- --room=<id> [--spawn=<entry>]`. In-game, F2/F3/F4 do the same without a
+## relaunch (_debug_cycle). Both are debug-build only. Without --spawn it lands on the room's
+## default entry rather than the room centre, which in a carved room is likely rock.
 func _debug_start() -> Dictionary:
 	var room_id := ""
 	var entry_id := ""
@@ -72,8 +73,31 @@ func _debug_start() -> Dictionary:
 		push_error("World: --room=%s has no geometry; using the normal start." % room_id)
 		return {}
 	if entry_id.is_empty():
-		entry_id = "spawn" if entries.has("spawn") else str(entries.keys()[0])
+		entry_id = RoomCycle.default_entry(entries.keys())
 	return {"room": room_id, "entry": entry_id}
+
+
+## F2/F3: previous/next room in data/rooms.json order, landing on its default entry. F4: the
+## current room's next entry. The actions only exist in debug builds (InputConfig.DEBUG). Ignored
+## in the instrument state, so a door can't be left mid-performance by teleport.
+func _debug_cycle(event: InputEvent) -> bool:
+	var room_delta := 0
+	if event.is_action_pressed("debug_room_prev"):
+		room_delta = -1
+	elif event.is_action_pressed("debug_room_next"):
+		room_delta = 1
+	elif not event.is_action_pressed("debug_entry_next"):
+		return false
+	if NoteBus.instrument_state_active or _current_room == null:
+		return true
+	var room_id := _current_room.room_id
+	var entries: Array = RoomGraph.geometry(room_id).get("entries", {}).keys()
+	var entry_id := RoomCycle.step(entries, _current_entry, 1)
+	if room_delta != 0:
+		room_id = RoomCycle.step(RoomGraph.room_ids(), room_id, room_delta)
+		entry_id = RoomCycle.default_entry(RoomGraph.geometry(room_id).get("entries", {}).keys())
+	enter_room.call_deferred(room_id, entry_id)
+	return true
 
 
 ## Swap to a room and place the player at one of its named entries. Freeing the
@@ -93,6 +117,7 @@ func enter_room(room_id: String, entry_id: String) -> void:
 	room_host.add_child(room)
 	room.transition_requested.connect(_on_transition_requested)
 	_current_room = room
+	_current_entry = entry_id
 
 	player.global_position = room.entry_position(entry_id)
 	_apply_camera_limits(room.bounds())
@@ -152,17 +177,21 @@ func _update_shake(delta: float) -> void:
 
 func _process(delta: float) -> void:
 	_update_shake(delta)
-	debug_label.text = "%d x %d   layout: %s   room: %s%s" % [
+	debug_label.text = "%d x %d   layout: %s   room: %s @ %s%s" % [
 		get_viewport_rect().size.x,
 		get_viewport_rect().size.y,
 		InputConfig.Layout.keys()[InputConfig.current_layout],
 		_current_room.room_id if _current_room != null else "-",
+		_current_entry,
 		"   [LIGHT TEST]" if _bright_test else "",
 	]
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not (event is InputEventKey and event.pressed and not event.echo):
+		return
+	if _debug_cycle(event):
+		get_viewport().set_input_as_handled()
 		return
 	# Tab swaps movement layout. Temporary, until there is a settings menu.
 	if event.keycode == KEY_TAB:

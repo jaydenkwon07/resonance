@@ -45,6 +45,11 @@ func exits(room_id: String) -> Array:
 	return room(room_id).get("exits", [])
 
 
+## Every room id, in data/rooms.json order.
+func room_ids() -> Array:
+	return _rooms.keys()
+
+
 ## Where the slice begins: {room, entry}.
 func start() -> Dictionary:
 	return _start
