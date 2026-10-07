@@ -37,13 +37,14 @@ static func build_chimes(parent: Node2D, geom: RoomGeometry, defs: Array) -> voi
 
 
 ## Decorative sealed doors (§7.5, M5 Step 5c): unopenable five-note doors with no link, melody
-## or lock. Placed from a perimeter opening exactly like a real door (DOOR_INSET + opening
-## centring) and facing inward, so they land in the same reserved footprint and read as the
-## same family.
+## or lock. Placed from a 2-tile opening exactly like a real door (DOOR_INSET + opening
+## centring), so they land in the same reserved footprint and read as the same family. The
+## opening is a perimeter one, or with an explicit `facing` an interior recess (the Resonance
+## core's boss door, until M12 gives it a real one).
 static func build_sealed_doors(parent: Node2D, geom: RoomGeometry, defs: Array) -> void:
 	for door_def in defs:
 		var at := RoomGeometry.to_v2i(door_def.get("at", [0, 0]))
-		var inward := geom.inward(at)
+		var inward := geom.door_facing(door_def)
 		var sealed := SealedDoor.new()
 		sealed.facing = inward
 		sealed.socket_count = int(door_def.get("sockets", 5))

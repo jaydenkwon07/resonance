@@ -174,7 +174,7 @@ def pinned_cells(data: dict) -> set[tuple[int, int]]:
 	zone: set[tuple[int, int]] = set()
 	for d in list(data.get("links", [])) + list(data.get("sealed_doors", [])):
 		at = tuple(d.get("at", [0, 0]))
-		inw = roomlib.inward(at, w, h)
+		inw = roomlib.door_facing(d, w, h)
 		if inw == (0, 0):
 			continue
 		zone |= roomlib.mouth_cells(at, inw)
@@ -428,7 +428,7 @@ def footprint_problems(data: dict, loops: list[list[tuple[int, int]]]) -> list[s
 	for d in list(data.get("links", [])) + list(data.get("sealed_doors", [])):
 		if d.get("door") or d.get("requires") or "sockets" in d:
 			at = tuple(d["at"])
-			for c in roomlib.rect_to_cells(roomlib.door_rect(at, roomlib.inward(at, w, h))):
+			for c in roomlib.rect_to_cells(roomlib.door_rect(at, roomlib.door_facing(d, w, h))):
 				# The slab overlaps the jamb rock by design; only its floor cells must stay floor.
 				if 0 <= c[1] < h and 0 <= c[0] < w and grid[c[1]][c[0]] == ".":
 					cells.append((f"door zone {at}", c))

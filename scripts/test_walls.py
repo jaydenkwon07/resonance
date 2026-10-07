@@ -117,6 +117,13 @@ def main() -> int:
 		check(probs == [], f"{path.stem}: loops valid, footprints clear, pins held"
 			+ ("" if not probs else f" — {probs[:3]}"))
 
+	# A sealed door with its own facing pins its mouth and leaf inside the room, like an edge door.
+	inner = room(["#########", "#.......#", "#....##.#", "#.......#", "#.......#", "#....##.#", "#########"],
+		sealed_doors=[{"at": [5, 3], "facing": [-1, 0], "sockets": 0}])
+	zone = walls.pinned_cells(inner)
+	check({(5, 3), (5, 4), (4, 3), (4, 4), (5, 2), (5, 5)} <= zone and (2, 3) in zone,
+		"an interior sealed door pins its mouth and its approach")
+
 	# Carved rooms cut their corners less than natural ones; an explicit `passes` still wins.
 	carved = dict(hollow, geometry="carved")
 	check(walls.passes_for(carved) == walls.CARVED_CHAIKIN_PASSES < walls.passes_for(hollow) == walls.CHAIKIN_PASSES,

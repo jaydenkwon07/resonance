@@ -162,3 +162,144 @@ Owner answered 1–3; delegated 4–5.
    playthrough:** note whether they try the notch and how long they spend there; that's the M10 input.
 5. **Cistern `straight_run (25,33)` baselined** (decided by Claude, delegated): breaking the run
    would be a second edit to locked Cistern geometry, for a wall that reads as built anyway.
+
+## Resonance — round 1 (v1, 2026-10-06) — DRAFT, awaiting ruling
+
+A ring around a central core, mirrored on both axes (cols 31|32, rows 17|18). Four apses open off
+the north and south arms. Three are for the boss door's stations, and the fourth is held for the
+fifth-note station the layout doc anticipates. The north and south arms narrow to 4 rows between
+their apses, giving M12 somewhere to gate one station from the next. The room file is unchanged
+until a ruling. Top half shown; rows 18–35 mirror it:
+
+```
+ 0 ################################################################   N band
+ 1 ################################################################
+ 2 ######.............##########################.............######   NW / NE apses, cols 6–18 / 45–57, rows 2–5
+ 3 ######.............##########################.............######
+ 4 ######.............##########################.............######
+ 5 ######.............##########################.............######
+ 6 ###.........................########.........................###   N arm, rows 6–12; narrowed to rows 9–12 at cols 28–35
+ 7 ###.........................########.........................###
+ 8 ###.........................########.........................###
+ 9 ###..........................................................###
+10 ###..........................................................###
+11 ###..........................................................###
+12 ###..........................................................###
+13 ###.............oooooooooooooooooooooooooooooooo.............###   core `o`, cols 16–47, rows 13–22
+14 #...............oooooooooooooooooooooooooooooooo...............#   W/E vestibules, rows 14–21
+15 #...............oooooooooooooooooooooooooooooooo...............#
+16 #...............oooooooooooooooooooooooooooooooo...............#
+17 ................oooooooooooooooooooooooooooooooo................   W: from the Antechamber · E: sealed Act 2 door [63,17] (both unchanged)
+```
+
+Checks (`check_room.py --grid … --narrowest`): lint, loops, footprints, pins, seals clean; narrowest
+59 px. Rock **31.1%** excl outcrops / 45.0% with the core. Entry `from_antechamber [1,17]` and the
+sealed door unchanged. The vestibules must reach rows 14–21: shorter ones let the wall cross the
+sealed door's zone (rule in `.claude/rules/rooms.md`). Earlier scratch drafts merged the apses into
+the ring corners, so they didn't read as separate places, and ran 37–39% rock.
+
+Captures: `resonance-v1-full-lit.png`, `-full-dark.png`, `-dark-2-17` (arrival), `-dark-31-10`
+(the N narrowing), `-lit`, close-ups of the north narrowing. The four player figures on the full
+captures are the capture tool's camera stops, not content.
+
+For the owner:
+1. **Where is the boss door?** The layout doc calls the room "the boss door". The only door here is
+   the east edge's 5-socket sealed Act 2 exit, and doors are only placeable on edges today. Is the
+   boss door that east door (opened by the station melody, leading to Act 2), or something at the
+   core? A core door would need its own face carved into the core, so this can change the grid.
+2. **Station gating is M12, and can't be today's `AbilityGate`.** That gate lifts when the note is
+   *held*, and the player arrives holding all three, so every gate would already be open. The
+   narrowings are only the seam. Which apse is which station is the melody order: yours, and not
+   needed until content finalisation.
+3. **Ring width.** The W/E arms are 13 tiles wide and N/S 7. Generous for a 2×2 room; at one screen
+   the player sees part of the ring at a time. Narrow the arms (more core, more rock), or keep?
+4. The core is outcrop `o`, so it sits outside the rock budget. As `#` it would read 45%.
+
+### Owner ruling on round 1 (2026-10-06): the boss door is in the core
+
+The owner's direction, in their words: *"I want there to be an actual fight. … I want option B. But I
+want that entire room … to be some kind of large puzzle needed to open the door in the center. Once
+the puzzle (or even some kind of mini fight like an arena in hollow knight) is completed, then we
+will be able to go in the door and actually fight the boss. The boss itself will be for later (much
+later) and the puzzle/arena will be right before we implement the boss. Priorities: the boss will be
+one of the last priorities along with the pre-boss fight/puzzle."*
+
+- **Option B:** the boss door sits in the core's face; the east edge stays the sealed Act 2 exit.
+- **A boss fight exists** (answers CLAUDE.md §8 "does combat exist at all", for the boss at least).
+  Its approach is still open.
+- **The ring is the pre-boss challenge:** a room-wide puzzle or an arena fight that opens the core
+  door. Which one is open. §3.9's station melody may or may not be it.
+- **Both are last priorities**: the pre-boss puzzle/arena lands just before the boss.
+- **This disagrees with the design doc** (§3.9: the stations' melody *is* the boss, and the demo
+  ends when the door opens). The design doc is the owner's to update (Drive).
+
+## Resonance — round 2 (v2, 2026-10-06) — DRAFT, awaiting ruling
+
+Round 1 plus the core's west face: a 2-deep, 4-tall recess (cols 16–17, rows 16–19) where the door
+will stand, facing the entry so it's the first thing seen. Rows 13–24:
+
+```
+13 ###.............oooooooooooooooooooooooooooooooo.............###
+14 #...............oooooooooooooooooooooooooooooooo...............#
+15 #...............oooooooooooooooooooooooooooooooo...............#
+16 #.................oooooooooooooooooooooooooooooo...............#
+17 ..................oooooooooooooooooooooooooooooo................
+18 ..................oooooooooooooooooooooooooooooo................
+19 #.................oooooooooooooooooooooooooooooo...............#
+20 #...............oooooooooooooooooooooooooooooooo...............#
+21 #...............oooooooooooooooooooooooooooooooo...............#
+22 ###.............oooooooooooooooooooooooooooooooo.............###
+23 ###..........................................................###
+24 ###..........................................................###
+```
+
+Checks clean; narrowest 59 px; rock 31.1% excl outcrops. Captures: `resonance-v2-full-lit.png`,
+`-full-dark.png`, `-dark-12-17` (approaching the face), `-lit`, close-ups of the face.
+
+For the owner:
+1. **The recess is empty in grey-box.** Doors can only be placed on room edges today, so no door can
+   stand in the face yet. For the stranger playthrough, a blank notch in the core may not read as
+   "the door". Option: let `sealed_doors` take an interior cell plus a `facing`, as `ability_gates`
+   already do. That's a small code change, and it would show a shut door there until the real one.
+2. **The apses and narrowings were shaped for §3.9's stations.** They stay as flexible geometry
+   until the puzzle/arena is designed; an arena might want the ring more open.
+3. **M7's "three station markers"** (content finalisation) assumed §3.9. Drop them from M7, or keep
+   placeholders?
+4. **Where the demo ends:** at the core door opening, or after the boss? The boss is much later, so
+   the Act 1 demo (M14) may need to end earlier.
+
+### Owner rulings on round 2 (2026-10-06)
+
+1. **Shut door in the core face: yes.** `sealed_doors` now takes an optional `facing`. Without one
+   a door faces in from its edge, as before. With one it stands at an interior cell
+   (`door_facing` in `roomlib`/`RoomGeometry`; lint, wall pins and placement all use it).
+2. **Station markers are dropped from M7.**
+3. **The boss fight is the end of the demo**, built last (owner: "Much later, I meant like the end
+   of the demo"). The demo no longer ends when a door opens.
+
+## Resonance — round 3 (v3, 2026-10-06) — DRAFT, awaiting ruling
+
+Round 1 plus the core's west face with a shut door: `sealed_doors {at [18,17], facing [-1,0],
+sockets 0}`. Zero sockets on purpose: design doc §3.8, "a door with no gems facing you is a door that
+is not asking you for anything"; this one opens by the puzzle/arena, not a melody. Rows 14–21,
+cols 0–29:
+
+```
+14 #...............oooooooooooooo
+15 #.................oooooooooooo
+16 #.................oooooooooooo
+17 .....................ooooooooo
+18 .....................ooooooooo
+19 #.................oooooooooooo
+20 #.................oooooooooooo
+21 #...............oooooooooooooo
+```
+
+The recess is shaped like an edge door's surroundings, because the wall trace cuts a corner into any
+floor cell boxed in on two sides, and the door's slab covers floor. So: the ring side 6 rows tall
+(rows 15–20, cols 16–17), the 2-tile opening flanked by rock (col 18), and a 2-tile stub behind it
+(cols 19–20) standing in for the corridor an edge door gets off-camera. It reads as the way into
+the boss room. Round 2's 4-tall recess and a 3-deep one both failed the footprint check.
+
+Checks clean; narrowest 59 px; rock 31.1% excl outcrops. Captures: `resonance-v3-full-lit.png`,
+`-full-dark.png`, `-dark-11-17` (approach), `-lit`, close-ups.

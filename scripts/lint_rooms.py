@@ -73,12 +73,23 @@ def lint_room(
 		return in_bounds(x, y) and grid[y][x] == "."
 
 	def perimeter_openings(defs: list, label: str) -> None:
-		"""links and sealed_doors both sit at a 2-tile perimeter opening."""
+		"""links and sealed_doors both sit at a 2-tile perimeter opening — except a sealed door
+		with its own `facing`, which is set into an interior wall."""
 		for d in defs:
 			at = tuple(d.get("at", [0, 0]))
-			inw = roomlib.inward(at, cols, rows)
+			inw = roomlib.door_facing(d, cols, rows)
 			name = d.get("door") or d.get("melody_id") or label
-			if inw == (0, 0):
+			if "facing" in d:
+				if label != "sealed_door":
+					errors.append(f"{label} '{name}' at {at} has a facing; only sealed doors take one")
+					continue
+				if inw not in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+					errors.append(f"{label} '{name}' at {at}: facing {list(inw)} is not a unit axis step")
+					continue
+				if roomlib.inward(at, cols, rows) != (0, 0):
+					errors.append(f"{label} '{name}' at {at} is on the perimeter; drop its facing")
+					continue
+			elif inw == (0, 0):
 				errors.append(f"{label} '{name}' at {at} is not on the perimeter")
 				continue
 			for c in roomlib.opening_cells(at, inw):
@@ -131,7 +142,7 @@ def lint_room(
 	content_cells = _content_cells(data)
 	for d in list(data.get("links", [])) + list(data.get("sealed_doors", [])):
 		at = tuple(d.get("at", [0, 0]))
-		inw = roomlib.inward(at, cols, rows)
+		inw = roomlib.door_facing(d, cols, rows)
 		has_leaf = d.get("door") is not None or "melody_id" in d or "sockets" in d or d.get("requires") is not None
 		if inw == (0, 0) or not has_leaf:
 			continue  # a plain (free) link reserves nothing
@@ -145,7 +156,7 @@ def lint_room(
 	# mouth an exit's length is free (owner, 2026-09-26). ---
 	for d in list(data.get("links", [])) + list(data.get("sealed_doors", [])):
 		at = tuple(d.get("at", [0, 0]))
-		inw = roomlib.inward(at, cols, rows)
+		inw = roomlib.door_facing(d, cols, rows)
 		if inw == (0, 0):
 			continue
 		for c in roomlib.opening_cells(at, inw):

@@ -47,6 +47,15 @@ def inward(at: tuple[int, int], w: int, h: int) -> tuple[int, int]:
 	return (0, 0)
 
 
+def door_facing(d: dict, w: int, h: int) -> tuple[int, int]:
+	"""Which way a link or sealed door faces into the room: its own `facing` if it has one (a
+	sealed door set into an interior wall, like the Resonance core's), else inward from its edge."""
+	if "facing" in d:
+		fx, fy = d["facing"]
+		return (int(fx), int(fy))
+	return inward(tuple(d.get("at", [0, 0])), w, h)
+
+
 def along(inw: tuple[int, int]) -> tuple[int, int]:
 	"""The along-the-opening axis: perpendicular to `inward`."""
 	return (abs(inw[1]), abs(inw[0]))
@@ -159,7 +168,7 @@ def exempt_cells(data: dict) -> set[Cell]:
 	out: set[Cell] = set()
 	for d in list(data.get("links", [])) + list(data.get("sealed_doors", [])):
 		at = tuple(d.get("at", [0, 0]))
-		inw = inward(at, w, h)
+		inw = door_facing(d, w, h)
 		if inw == (0, 0):
 			continue
 		out |= mouth_cells(at, inw)

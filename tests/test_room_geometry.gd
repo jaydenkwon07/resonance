@@ -44,6 +44,8 @@ func test_inward() -> void:
 	check(g.inward(Vector2i(5, 0)) == Vector2i(0, 1), "north edge points in +y")
 	check(g.inward(Vector2i(5, 35)) == Vector2i(0, -1), "south edge points in -y")
 	check(g.inward(Vector2i(10, 10)) == Vector2i(0, 0), "an interior cell has no inward")
+	check(g.door_facing({"at": [47, 5]}) == Vector2i(-1, 0), "a door with no facing faces in from its edge")
+	check(g.door_facing({"at": [10, 10], "facing": [-1, 0]}) == Vector2i(-1, 0), "an interior door uses its own facing")
 
 
 func test_opening_offset() -> void:

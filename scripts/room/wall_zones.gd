@@ -28,7 +28,7 @@ static func pinned_cells(data: Dictionary) -> Dictionary:
 	openings.append_array(data.get("sealed_doors", []))
 	for d: Dictionary in openings:
 		var at := RoomGeometry.to_v2i(d.get("at", [0, 0]))
-		var inw := geom.inward(at)
+		var inw := geom.door_facing(d)
 		if inw == Vector2i.ZERO:
 			continue
 		var along := Vector2i(absi(inw.y), absi(inw.x))

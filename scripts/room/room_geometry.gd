@@ -48,6 +48,15 @@ func inward(at: Vector2i) -> Vector2i:
 	return Vector2i(0, 0)
 
 
+## Which way a link or sealed door faces into the room: its own `facing` if it has one (a sealed
+## door set into an interior wall, like the Resonance core's), else inward from its edge cell.
+## roomlib.door_facing is the Python twin.
+func door_facing(def: Dictionary) -> Vector2i:
+	if def.has("facing"):
+		return to_v2i(def["facing"])
+	return inward(to_v2i(def.get("at", [0, 0])))
+
+
 ## Half-tile shift along the opening edge toward the 2-tile gap's true centre. The stored `at`
 ## is the gap's min-corner cell, so without this the trigger and door sit half a tile off to one
 ## side. The along-edge axis is whichever one `inward_dir` is not on.

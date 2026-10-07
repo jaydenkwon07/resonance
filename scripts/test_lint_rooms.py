@@ -214,6 +214,18 @@ def main() -> int:
 	r = clone(); r["links"][0]["at"] = [10, 10]
 	check(has(lint_room(r)[0], "not on the perimeter"), "an interior link is an error")
 
+	# A sealed door with its own facing may stand inside the room (the Resonance core's).
+	inner = next((x, y) for y in range(4, 30) for x in range(4, 40)
+		if r["grid"][y][x] == "." and r["grid"][y + 1][x] == ".")
+	r = clone(); r["sealed_doors"] = [{"at": list(inner), "facing": [1, 0], "sockets": 0}]
+	check(not has(lint_room(r)[0], "sealed_door"), "an interior sealed door with a facing is ok")
+	r["sealed_doors"][0]["facing"] = [1, 1]
+	check(has(lint_room(r)[0], "not a unit axis step"), "a diagonal facing is an error")
+	r = clone(); r["sealed_doors"] = [dict(BASE["sealed_doors"][0], facing=[0, -1])]
+	check(has(lint_room(r)[0], "on the perimeter; drop its facing"), "a perimeter sealed door with a facing is an error")
+	r = clone(); r["links"][0]["facing"] = [1, 0]
+	check(has(lint_room(r)[0], "only sealed doors take one"), "a link with a facing is an error")
+
 	# Opening cell not floor.
 	r = clone(); set_cell(r, 23, 0, "#")  # block one cell of door_omega's N opening
 	check(has(lint_room(r)[0], "opening cell"), "a rocked-over opening is an error")
