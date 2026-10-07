@@ -25,7 +25,8 @@ validated. Since then, in order:
 **Git state (updated 2026-09-26):** Phase 1 steps 1–4 are committed on `main` (not pushed — the
 owner asks for pushes explicitly). `_capture_room.gd` / `.tscn` / `.gd.uid` in the project root
 stay untracked throwaway scaffolding (now takes `--out=`). **Never commit it.** Kept past the
-natural-walls batch for the carved rooms' captures (owner, 2026-09-29); delete when M7's carving ends.
+natural-walls batch for the carved rooms' captures (owner, 2026-09-29); **deleted 2026-10-06** when
+the carving ended. Recreate a throwaway scene from the routine below if stills are needed again.
 
 **Commit convention:** no `Co-Authored-By` trailer (parent `~/Code/Projects/CLAUDE.md`). Past
 commits end with a `Claude-Session:` line only.

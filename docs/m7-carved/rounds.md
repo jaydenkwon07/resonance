@@ -277,7 +277,7 @@ For the owner:
 3. **The boss fight is the end of the demo**, built last (owner: "Much later, I meant like the end
    of the demo"). The demo no longer ends when a door opens.
 
-## Resonance — round 3 (v3, 2026-10-06) — DRAFT, awaiting ruling
+## Resonance — round 3 (v3, 2026-10-06) — APPLIED (owner: "go", 2026-10-06)
 
 Round 1 plus the core's west face with a shut door: `sealed_doors {at [18,17], facing [-1,0],
 sockets 0}`. Zero sockets on purpose: design doc §3.8, "a door with no gems facing you is a door that
@@ -303,3 +303,7 @@ the boss room. Round 2's 4-tall recess and a 3-deep one both failed the footprin
 
 Checks clean; narrowest 59 px; rock 31.1% excl outcrops. Captures: `resonance-v3-full-lit.png`,
 `-full-dark.png`, `-dark-11-17` (approach), `-lit`, close-ups.
+
+Applied as drafted. `export_wall_loops.py` rerun; `check_all.sh` 18/18. **M7's archetype carving is
+complete** (Threshold, Antechamber, Resonance). The `_capture_room` scaffolding is deleted, per the
+owner's 2026-09-29 instruction to keep it only until carving ended.
