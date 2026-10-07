@@ -52,7 +52,8 @@ func test_corner_cut() -> void:
 	check(top >= 2, "corner cutting leaves the middle of a straight wall on its line")
 
 
-## More Chaikin passes cut deeper and add vertices; zero passes is the raw trace.
+## More Chaikin passes cut deeper and add vertices; zero passes is the raw trace; carved rooms
+## take fewer.
 func test_passes_scale_the_cut() -> void:
 	var trace := WallTrace.trace(BOX)[0]
 	var p0 := WallOutline.loops(_room(BOX), 0, 0.0)[0]
@@ -63,6 +64,10 @@ func test_passes_scale_the_cut() -> void:
 	var corner := Vector2(T + T / 2, T + T / 2)  # inside the top-left floor cell's centre
 	check(_nearest(p2, corner) < _nearest(p0, corner), "passes pull the corner in toward the floor")
 	check(not p1.has(Vector2(T + T / 2, T)), "one pass already cuts the traced corner vertex away")
+	var carved := _room(BOX)
+	carved["geometry"] = "carved"
+	check(WallOutline.passes_for(carved) < WallOutline.passes_for(_room(BOX)), "carved rooms take fewer passes")
+	check(WallOutline.loops(carved, -1, 0.0)[0] == p1, "a carved room cuts with its own pass count by default")
 
 
 ## All four corners of a symmetric room cut alike (mirror images within a pixel of snapping).

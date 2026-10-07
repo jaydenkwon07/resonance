@@ -117,6 +117,14 @@ def main() -> int:
 		check(probs == [], f"{path.stem}: loops valid, footprints clear, pins held"
 			+ ("" if not probs else f" — {probs[:3]}"))
 
+	# Carved rooms cut their corners less than natural ones; an explicit `passes` still wins.
+	carved = dict(hollow, geometry="carved")
+	check(walls.passes_for(carved) == walls.CARVED_CHAIKIN_PASSES < walls.passes_for(hollow) == walls.CHAIKIN_PASSES,
+		"carved rooms take fewer corner-cutting passes")
+	check(walls.wall_loops(carved) == walls.wall_loops(carved, passes=walls.CARVED_CHAIKIN_PASSES)
+		and walls.wall_loops(carved, passes=2) == walls.wall_loops(hollow, passes=2),
+		"a carved room's default loops use its own passes; an explicit count overrides")
+
 	# Parity: the fixture the GDScript twin is checked against must be what walls.py makes now.
 	import export_wall_loops
 	current = export_wall_loops.OUT.exists() and export_wall_loops.OUT.read_text(encoding="utf-8") \

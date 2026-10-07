@@ -13,6 +13,7 @@ extends RefCounted
 
 # --- Tuning: the spec's six constants, in one place (walls.py holds the same six) ---
 const CHAIKIN_PASSES := 2
+const CARVED_CHAIKIN_PASSES := 1  ## carved rooms keep their built corners (owner, 2026-10-06)
 const CHAIKIN_RATIO := 0.25
 const ROUGH_STEP := 6.0      ## px between roughness samples along a segment
 const ROUGH_AMP_MIN := 0.0   ## px — lets some stretches stay clean
@@ -22,9 +23,17 @@ const ROUGH_SPAN := 120.0    ## px of wall between amplitude samples (4 tiles)
 const _M32 := 0xFFFFFFFF
 
 
+## Corner-cutting passes for a room: fewer for carved rooms, which should read as built.
+static func passes_for(data: Dictionary) -> int:
+	return CARVED_CHAIKIN_PASSES if data.get("geometry") == "carved" else CHAIKIN_PASSES
+
+
 ## A room's final wall loops, whole native pixels. `passes`/`amp_max` let a capture render
-## option B (amp_max 0) or the raw trace (passes 0) through the same code path.
-static func loops(data: Dictionary, passes: int = CHAIKIN_PASSES, amp_max: float = ROUGH_AMP_MAX) -> Array[PackedVector2Array]:
+## option B (amp_max 0) or the raw trace (passes 0) through the same code path; a negative
+## `passes` means the room's own (`passes_for`).
+static func loops(data: Dictionary, passes: int = -1, amp_max: float = ROUGH_AMP_MAX) -> Array[PackedVector2Array]:
+	if passes < 0:
+		passes = passes_for(data)
 	var zone := WallZones.pinned_cells(data)
 	var seed := room_seed(str(data.get("room_id", "")))
 	var out: Array[PackedVector2Array] = []

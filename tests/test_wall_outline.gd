@@ -43,7 +43,7 @@ func test_parity(doc: Dictionary) -> void:
 		var data := _data(case)
 		var name: String = case["name"]
 		_same(WallTrace.trace(data.get("grid", [])), case["trace"], name + ": trace matches")
-		_same(WallOutline.loops(data, WallOutline.CHAIKIN_PASSES, 0.0), case["b"], name + ": B matches")
+		_same(WallOutline.loops(data, -1, 0.0), case["b"], name + ": B matches")
 		_same(WallOutline.loops(data), case["c"], name + ": C matches")
 
 

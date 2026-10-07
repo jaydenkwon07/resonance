@@ -140,3 +140,25 @@ For the owner:
 Applied as drafted (2026-10-06). "go" didn't answer items 1–3, so nothing changed for them: the
 west wall stays blank, rock 35.1% stands as a warning, and carved-room smoothing is still open.
 `export_wall_loops.py` rerun; `check_all.sh` 18/18. No content in the room, so no cells to re-check.
+
+## Rulings (2026-10-06)
+
+Owner answered 1–3; delegated 4–5.
+
+1. **Carved rooms are smoothed less.** `CARVED_CHAIKIN_PASSES = 1` (natural rooms stay at 2), keyed
+   on `geometry: "carved"` via `passes_for()` in `walls.py` and its twin `WallOutline`. Roughness is
+   unchanged. "Less", not "none", so 1 rather than 0: one pass leaves a short 45° chamfer and keeps
+   the niches and columns square. 0 would be the raw cell-centre trace, a one-constant change if the
+   chamfers still read soft. Captures: `threshold-v2-full-*`, `antechamber-v2-full-*`.
+2. **Rock ~35% is accepted for carved rooms** (Threshold 35.4%, Antechamber 34.0%). It stays a
+   lint warning; nothing is baselined for it.
+3. **The Antechamber's west transept gets a sealed door** (5 sockets, like the other three sealed
+   exits): an opening at W rows 8–9 with `sealed_doors [0,8]`, no link or graph edge. The slab
+   overhangs rows 7 and 10 by half a tile, so both side recesses grew to rows 6–11 (mirrored on the
+   east) or the wall crosses the door zone. Rock 35.1% → 34.0%. Captures: `antechamber-v2-*`.
+4. **Cistern-side stub: accepted for grey-box, no placeholder** (decided by Claude, delegated). A
+   sealed door would block the arrival cell `from_threshold [23,34]` (its collision sits on the
+   landing), and a non-blocking frame is new presentation code (M10). **Watch item for the stranger
+   playthrough:** note whether they try the notch and how long they spend there; that's the M10 input.
+5. **Cistern `straight_run (25,33)` baselined** (decided by Claude, delegated): breaking the run
+   would be a second edit to locked Cistern geometry, for a wall that reads as built anyway.

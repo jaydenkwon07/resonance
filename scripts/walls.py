@@ -24,6 +24,7 @@ from roomlib import TILE
 
 # --- Tuning (the spec's six constants; start values, tuned on the Hollow prototype) ---
 CHAIKIN_PASSES = 2
+CARVED_CHAIKIN_PASSES = 1  # carved rooms keep their built corners (owner, 2026-10-06)
 CHAIKIN_RATIO = 0.25
 ROUGH_STEP = 6.0      # px between roughness samples along a segment
 ROUGH_AMP_MIN = 0.0   # px — lets some stretches stay clean
@@ -327,9 +328,17 @@ def room_seed(room_id: str) -> int:
 	return h
 
 
-def wall_loops(data: dict, passes: int = CHAIKIN_PASSES, amp_max: float = ROUGH_AMP_MAX) -> list[list[tuple[int, int]]]:
+def passes_for(data: dict) -> int:
+	"""Corner-cutting passes for a room: fewer for carved rooms, which should read as built."""
+	return CARVED_CHAIKIN_PASSES if data.get("geometry") == "carved" else CHAIKIN_PASSES
+
+
+def wall_loops(data: dict, passes: int | None = None, amp_max: float = ROUGH_AMP_MAX) -> list[list[tuple[int, int]]]:
 	"""A room's final wall loops, integer native pixels. `passes`/`amp_max` exist so captures
-	and tests can render option B (amp_max 0) or the raw trace (passes 0) from one code path."""
+	and tests can render option B (amp_max 0) or the raw trace (passes 0) from one code path;
+	`passes` defaults to the room's own (`passes_for`)."""
+	if passes is None:
+		passes = passes_for(data)
 	zone = pinned_cells(data)
 	seed = room_seed(str(data.get("room_id", "")))
 	out = []
