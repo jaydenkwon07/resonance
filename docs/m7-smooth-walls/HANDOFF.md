@@ -272,14 +272,27 @@ captures' `.import` files appear on the next import; commit them with the PNGs.
   bump into an invisible wall. A placeholder look needs an owner ruling (Godot visual).
 - **Note 1 visible from frame one** — recorded as an open M8 question in `hollow-pilot.md`
   (accept vs wake the pickup light at the low bend). The M7 playthrough tests it as-is.
-- `NoteRegistry` doesn't validate internal `ability_gates[].note` — must land **before the Span is
-  carved full-height** (CLAUDE.md "Now").
+- **RESOLVED (found 2026-10-06):** internal `ability_gates[].note` *is* validated, by the lint
+  against `notes.json` (`lint_rooms.py`) and at boot by `RoomGraph` (`room_graph.gd`).
 - `data/melodies/door_backtrack.json` is orphaned (loaded, referenced by nothing).
 - `scripts/new_room.py` doesn't register the room in `rooms.json` (spec said it would).
 - In true world coordinates the loop doesn't close (the Choir sits ~108 tiles below the Cistern,
   the Span beside it must sit ~36 below). Harmless now; matters if a map screen is ever built.
-- The CLAUDE.md "The one rule" grep's `^\./` filter doesn't match this machine's grep output (ugrep
-  prints `tests/…`); it lists exempt test lines instead of nothing. Use `^(\./)?(tests|…)`.
+- **RESOLVED:** the CLAUDE.md "one rule" grep now uses `^(\./)?(tests|…)`.
+
+## Content finalisation (2026-10-06) — DONE
+
+Audit of every room against spec §4.2–4.3 after carving. Everything placed matches: pickups
+`n_break` Hollow, `n_step` Drip, `n_mend` Choir (bottom), none left in the Gallery; chimes for Door A
+(Cistern hub), Door B (partway down the Stair), Door C (Span), and Door Ω's three path-order
+fragments (Drip, Overlook, Choir; the Choir echoes its fragment high, middle and low, `d93747d`);
+the Drip and Span ability gates; sealed doors on the Cistern S, Choir E, Antechamber W (2026-10-06,
+decorative) and Resonance E, plus the Resonance core's boss door. The carved rooms hold no other
+content. Station markers are dropped (owner). `check_all.sh` 18/18 covers what can be checked:
+content on floor and clear of reserved footprints (lint), clear of the wall polygons (`test_walls`),
+graph solvability and the melody pitch-class rule (`validate_rooms`), seals, boot.
+
+Not decided: whether to delete the orphaned `door_backtrack` melody (the owner's data).
 
 ## Still ahead in M7 after both steps
 
