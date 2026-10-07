@@ -88,3 +88,55 @@ Cistern-side placeholder for the stub, rock 35.4% in the Threshold (stands as a 
 - Full `check_room.py`: Threshold OK (narrowest 59 px); Cistern OK, with **one new warning** —
   `straight_run at (25, 33) (4 cells)`, the wall between the new opening and the 5-gem stub. Not
   baselined (the baseline is the owner's): accept, or break the run?
+
+## Antechamber — round 1 (v1, 2026-10-06) — APPLIED (owner: "go", 2026-10-06)
+
+A four-column hall: the waiting room before the boss. Distinct from the Threshold's niches by
+using free-standing columns instead of side recesses. Grid (mirrored about cols 15|16, apart from
+the E exit; the room file is unchanged until a ruling):
+
+```
+ 0 ################################   N band
+ 1 ################################
+ 2 #####......................#####   apse, cols 5–26
+ 3 #####......................#####
+ 4 ##............................##   hall, cols 2–29
+ 5 ##......oo............oo......##   column pair, rows 5–6 (2×2 `o`, cols 8–9 / 22–23)
+ 6 ##......oo............oo......##
+ 7 #..............................#   transept, rows 7–10 (one step wider)
+ 8 #...............................   E: to the Resonance chamber (unchanged, rows 8–9)
+ 9 #...............................
+10 #..............................#
+11 ##......oo............oo......##   column pair, rows 11–12
+12 ##......oo............oo......##
+13 ##............................##
+14 #######..................#######   south vestibule, cols 7–24
+15 #######..................#######
+16 ###############..###############   S: from the Cistern through Door Ω (unchanged, col 15)
+17 ###############..###############
+```
+
+Checks (`check_room.py --grid … --narrowest`): lint, loops, footprints, pins, seals all clean;
+narrowest passage 59 px. Warning: rock **35.1%** (37.8% with the columns), level with the
+Threshold's 35.4%, for the same reason (the 2-row N band alone is 11%). Entries unchanged:
+`from_cistern [15,14]`, `from_resonance [28,8]`. Two earlier drafts in scratch were 47% and 40%
+rock and were widened before capture.
+
+Captures: `antechamber-v1-full-lit.png`, `-full-dark.png`, `-dark-15-13` (arrival from Door Ω),
+`-dark-15-8` (centre), `-dark-28-8` (the E exit), and `-lit`, each with a close-up of the west
+column pair.
+
+For the owner:
+1. **Columns vs the smoothing.** The 2×2 columns render as rounded squares, which reads as built.
+   The outer corners soften like the Threshold's. It's the same open carved-room smoothing ruling;
+   it doesn't block this draft.
+2. **Symmetry and the E exit.** The exit punches through the east transept only; the west
+   transept end is blank wall. Accept, or mirror it with a decorative `sealed_doors` frame on the
+   W edge (rows 8–9)? A frame there might read as a second way on to a stranger.
+3. **Rock 35.1%:** accept for carved rooms (with the Threshold's ruling), or thin the N band?
+4. **The "quiet beat"** (spec §5: it goes dark again on purpose) is lighting, M8. Nothing here
+   lights it, so it's dark in grey-box already.
+
+Applied as drafted (2026-10-06). "go" didn't answer items 1–3, so nothing changed for them: the
+west wall stays blank, rock 35.1% stands as a warning, and carved-room smoothing is still open.
+`export_wall_loops.py` rerun; `check_all.sh` 18/18. No content in the room, so no cells to re-check.
